@@ -212,8 +212,6 @@ def crop_csv(size, source, target):
         cropped_data.to_csv(target + filename, index=False)
 
 
-
-
 def noise_injection(data, percentage):
     """
     Data augmentation technique that simply adds noise to the signal as a random Gaussian noise
@@ -321,7 +319,7 @@ def create_sets(main, dataset, training_size):
 
     # stages = ['GRASP/', 'PICK/']
     labels = ['failed/', 'success/']
-    augmented_folders = ['augmented x5/', 'augmented x10/', 'augmented x20/']
+    augmented_folders = ['augmented x1/']
 
     for augmented_folder in augmented_folders:
 
@@ -348,8 +346,8 @@ def create_sets(main, dataset, training_size):
                         grasp_target_location = main + dataset + 'GRASP/' + 'new_pp6_sets/' + augmented_folder + 'training set/' + label
                         pick_target_location = main + dataset + 'PICK/' + 'new_pp6_sets/' + augmented_folder + 'training set/' + label
                     else:
-                        grasp_target_location = main + dataset + 'GRASP/' + 'new_pp6_sets/' + augmented_folder + 'testing set/' + label
-                        pick_target_location = main + dataset + 'PICK/' + 'new_pp6_sets/' + augmented_folder + 'testing set/' + label
+                        grasp_target_location = main + dataset + 'GRASP/' + 'new_pp6_sets/' + augmented_folder + 'validation set/' + label
+                        pick_target_location = main + dataset + 'PICK/' + 'new_pp6_sets/' + augmented_folder + 'validation set/' + label
 
                     previous_name = name
                     # print(previous_name)
@@ -466,11 +464,11 @@ def main():
     #     location = main + dataset + stage
     #
     #     if dataset in ['1_proxy_rob537_x1/', '3_proxy_winter22_x1/']:
-    #         location_4 = location + 'new_pp4_augmented/augmented x20/'
+    #         location_4 = location + 'new_pp4_augmented/augmented x1/'
     #     elif dataset == '5_real_fall21_x1/':
     #         location_4 = location + 'new_pp3_joined/'
     #
-    #     location_5 = location + 'new_pp5_labeled/augmented x20/'
+    #     location_5 = location + 'new_pp5_labeled/augmented x1/'
     #     metadata_loc = main + dataset + 'metadata/'
     #
     #     data_into_labeled_folder(dataset, metadata_loc, location_4, location_5)
