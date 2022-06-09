@@ -17,7 +17,6 @@ import csv
 import shutil
 import random
 
-# trial 2
 
 def check_size(source):
 
