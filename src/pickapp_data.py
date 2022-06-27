@@ -221,7 +221,6 @@ def noise_injection(data, percentage):
     """
 
     channels = data.shape[1]
-
     df = pd.DataFrame()
 
     for i in range(channels):
@@ -440,22 +439,23 @@ def main():
 
     # --- Step 7: Augment Data ---
 
-    print("\n Step 3: Augmenting data...")
-    # for stage in tqdm(stages):
-    #     location = main + dataset + stage
-    #     location_3 = location + 'new_pp3_joined/'
-    #     location_4 = location + 'new_pp4_augmented/augmented x20/'
-    #
-    #     for filename in os.listdir(location_3):
-    #         # print(filename)
-    #
-    #         data = pd.read_csv(location_3 + filename)
-    #         augmentations = 20
-    #         end = filename.index('.')
-    #         for i in range(augmentations):
-    #             augmented_data = noise_injection(data, augmentations)
-    #             new_name = filename[:end] + "_aug_" + str(i) + ".csv"
-    #             augmented_data.to_csv(location_4 + new_name, index=False)
+    print("\nStep 3: Augmenting data...")
+    for stage in tqdm(stages):
+        augmentations = 5
+        location = main + dataset + stage
+        location_3 = location + 'new_pp3_joined/'
+        location_4 = location + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
+
+        for filename in os.listdir(location_3):
+            # print(filename)
+
+            data = pd.read_csv(location_3 + filename)
+
+            end = filename.index('.')
+            for i in range(augmentations):
+                augmented_data = noise_injection(data, 5)
+                new_name = filename[:end] + "_aug_" + str(i) + ".csv"
+                augmented_data.to_csv(location_4 + new_name, index=False)
 
     # --- Step 8: Save csvs in subfolders labeled ---
 
@@ -477,8 +477,8 @@ def main():
     # --- Step 9: Sparse data in the training and testing set
 
     print("\nStep 5: Sparsing data in training and testing sets...")
-    training_size = 0.7
-    create_sets(main, dataset, training_size)
+    # training_size = 0.7
+    # create_sets(main, dataset, training_size)
 
 
 if __name__ == '__main__':
