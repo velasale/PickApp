@@ -441,7 +441,7 @@ def main():
 
     print("\nStep 3: Augmenting data...")
     for stage in tqdm(stages):
-        augmentations = 5
+        augmentations = 10
         location = main + dataset + stage
         location_3 = location + 'new_pp3_joined/'
         location_4 = location + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
