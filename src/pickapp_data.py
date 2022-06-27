@@ -217,7 +217,7 @@ def noise_injection(data, percentage):
     Data augmentation technique that simply adds noise to the signal as a random Gaussian noise
     :param percentage: Percentage of the range (Max - Min) of the signal that would be considered in the noise function
     :type data: Dataframe
-    :return: New datafram with noise
+    :return: New dataframe with noise
     """
 
     channels = data.shape[1]
@@ -318,14 +318,14 @@ def create_sets(main, dataset, training_size):
 
     # stages = ['GRASP/', 'PICK/']
     labels = ['failed/', 'success/']
-    augmented_folders = ['augmented x1/']
+    augmented_folders = ['augmented x20/']
 
     for augmented_folder in augmented_folders:
 
         for label in labels:
 
-            grasp_source_location = main + dataset + 'GRASP/' + 'new_pp5_labeled/' + augmented_folder + label
-            pick_source_location = main + dataset + 'PICK/' + 'new_pp5_labeled/' + augmented_folder + label
+            grasp_source_location = main + dataset + 'GRASP/' + 'fixed_pp5_labeled/' + augmented_folder + label
+            pick_source_location = main + dataset + 'PICK/' + 'fixed_pp5_labeled/' + augmented_folder + label
 
             previous_name = ''
             for filename in os.listdir(grasp_source_location):
@@ -339,14 +339,14 @@ def create_sets(main, dataset, training_size):
                 if name != previous_name:
                     # Check name with previous, if different, flip coin
                     coin = random.random()
-                    print(coin)
+                    # print(coin)
 
                     if coin < training_size:
-                        grasp_target_location = main + dataset + 'GRASP/' + 'new_pp6_sets/' + augmented_folder + 'training set/' + label
-                        pick_target_location = main + dataset + 'PICK/' + 'new_pp6_sets/' + augmented_folder + 'training set/' + label
+                        grasp_target_location = main + dataset + 'GRASP/' + 'fixed_pp6_sets/' + augmented_folder + 'training set/' + label
+                        pick_target_location = main + dataset + 'PICK/' + 'fixed_pp6_sets/' + augmented_folder + 'training set/' + label
                     else:
-                        grasp_target_location = main + dataset + 'GRASP/' + 'new_pp6_sets/' + augmented_folder + 'validation set/' + label
-                        pick_target_location = main + dataset + 'PICK/' + 'new_pp6_sets/' + augmented_folder + 'validation set/' + label
+                        grasp_target_location = main + dataset + 'GRASP/' + 'fixed_pp6_sets/' + augmented_folder + 'validation set/' + label
+                        pick_target_location = main + dataset + 'PICK/' + 'fixed_pp6_sets/' + augmented_folder + 'validation set/' + label
 
                     previous_name = name
                     # print(previous_name)
@@ -378,8 +378,8 @@ def main():
     main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
 
     # dataset = '1_proxy_rob537_x1/'
-    dataset = '3_proxy_winter22_x1/'
-    # dataset = '5_real_fall21_x1/'
+    # dataset = '3_proxy_winter22_x1/'
+    dataset = '5_real_fall21_x1/'
 
     stages = ['GRASP/', 'PICK/']
 
@@ -441,7 +441,7 @@ def main():
 
     print("\nStep 3: Augmenting data...")
     for stage in tqdm(stages):
-        augmentations = 10
+        augmentations = 20
         location = main + dataset + stage
         location_3 = location + 'new_pp3_joined/'
         location_4 = location + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
@@ -464,11 +464,11 @@ def main():
     #     location = main + dataset + stage
     #
     #     if dataset in ['1_proxy_rob537_x1/', '3_proxy_winter22_x1/']:
-    #         location_4 = location + 'new_pp4_augmented/augmented x1/'
+    #         location_4 = location + 'fixed_pp4_augmented/augmented x20/'
     #     elif dataset == '5_real_fall21_x1/':
     #         location_4 = location + 'new_pp3_joined/'
     #
-    #     location_5 = location + 'new_pp5_labeled/augmented x1/'
+    #     location_5 = location + 'fixed_pp5_labeled/augmented x20/'
     #     metadata_loc = main + dataset + 'metadata/'
     #
     #     data_into_labeled_folder(dataset, metadata_loc, location_4, location_5)
