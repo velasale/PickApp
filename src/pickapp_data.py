@@ -230,7 +230,10 @@ def noise_injection(data, percentage):
         channel_range = abs(min(channel) - max(channel))
 
         # Step 2 - Define a % of noise according to that range
-        noise = np.random.normal(0, channel_range * percentage/100, channel.shape)
+        noise_center = 0
+        noise_sigma = 0.5 * channel_range * (percentage / 100)
+        noise = np.random.normal(noise_center, noise_sigma, channel.shape)
+        # print(noise)
         new_signal = channel + noise
 
         df[i] = new_signal
@@ -318,7 +321,7 @@ def create_sets(main, dataset, training_size):
 
     # stages = ['GRASP/', 'PICK/']
     labels = ['failed/', 'success/']
-    augmented_folders = ['augmented x20/']
+    augmented_folders = ['augmented x1/']
 
     for augmented_folder in augmented_folders:
 
@@ -378,8 +381,8 @@ def main():
     main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
 
     # dataset = '1_proxy_rob537_x1/'
-    # dataset = '3_proxy_winter22_x1/'
-    dataset = '5_real_fall21_x1/'
+    dataset = '3_proxy_winter22_x1/'
+    # dataset = '5_real_fall21_x1/'
 
     stages = ['GRASP/', 'PICK/']
 
@@ -440,22 +443,22 @@ def main():
     # --- Step 7: Augment Data ---
 
     print("\nStep 3: Augmenting data...")
-    for stage in tqdm(stages):
-        augmentations = 20
-        location = main + dataset + stage
-        location_3 = location + 'new_pp3_joined/'
-        location_4 = location + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
-
-        for filename in os.listdir(location_3):
-            # print(filename)
-
-            data = pd.read_csv(location_3 + filename)
-
-            end = filename.index('.')
-            for i in range(augmentations):
-                augmented_data = noise_injection(data, 5)
-                new_name = filename[:end] + "_aug_" + str(i) + ".csv"
-                augmented_data.to_csv(location_4 + new_name, index=False)
+    # for stage in tqdm(stages):
+    #     augmentations = 20
+    #     location = main + dataset + stage
+    #     location_3 = location + 'new_pp3_joined/'
+    #     location_4 = location + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
+    #
+    #     for filename in os.listdir(location_3):
+    #         # print(filename)
+    #
+    #         data = pd.read_csv(location_3 + filename)
+    #
+    #         end = filename.index('.')
+    #         for i in range(augmentations):
+    #             augmented_data = noise_injection(data, 5)
+    #             new_name = filename[:end] + "_aug_" + str(i) + ".csv"
+    #             augmented_data.to_csv(location_4 + new_name, index=False)
 
     # --- Step 8: Save csvs in subfolders labeled ---
 
@@ -463,12 +466,8 @@ def main():
     # for stage in tqdm(stages):
     #     location = main + dataset + stage
     #
-    #     if dataset in ['1_proxy_rob537_x1/', '3_proxy_winter22_x1/']:
-    #         location_4 = location + 'fixed_pp4_augmented/augmented x20/'
-    #     elif dataset == '5_real_fall21_x1/':
-    #         location_4 = location + 'new_pp3_joined/'
-    #
-    #     location_5 = location + 'fixed_pp5_labeled/augmented x20/'
+    #     location_4 = location + 'fixed_pp4_augmented/augmented x1/'
+    #     location_5 = location + 'fixed_pp5_labeled/augmented x1/'
     #     metadata_loc = main + dataset + 'metadata/'
     #
     #     data_into_labeled_folder(dataset, metadata_loc, location_4, location_5)
@@ -477,8 +476,8 @@ def main():
     # --- Step 9: Sparse data in the training and testing set
 
     print("\nStep 5: Sparsing data in training and testing sets...")
-    # training_size = 0.7
-    # create_sets(main, dataset, training_size)
+    training_size = 0.7
+    create_sets(main, dataset, training_size)
 
 
 if __name__ == '__main__':
