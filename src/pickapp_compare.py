@@ -295,9 +295,9 @@ def agg_linear_trend(x):
 
 def pic_list(file, variable):
     """
-    Reads a csv file and returns only tha variable of interest and Time.
-    This is useful because each topic in ROS saves several channels in one single csv file. Hence we want get only the
-    data of the channel that we are interested in.
+    Reads a csv file and returns only the variable of interest and Time.
+    This is useful because each topic in ROS saves several channels in one single csv file. Hence we want to get only
+    the data of the channel of our interest.
     :param file: csv file
     :param variable: Given as a string
     :return: Simplified lists (Time list, and values list)
@@ -397,7 +397,7 @@ def crossings(x, y):
 
 def pick_subplot(axrray, phase, real_times, real_values, proxy_times, proxy_values, variable):
     """
-    Creat the subplots of the 'Grasp' and 'Pick' phase of an aple pick
+    Create the subplots of the 'Grasp' and 'Pick' phase of an apple pick
     :param axrray: array of subplots
     :param phase: whether 'Grasp' or 'Pick'
     :param real_times: python list with the time values from real pick
@@ -594,7 +594,7 @@ def main():
     parser.add_argument('--variable',
                         default='force_z',
                         type=str,
-                        help='Channel of interest: "force_x", "force_y", "force_z", "torque_z", "f1_acc_z", "f1_gyro_x"')
+                        help='Channel of interest: "force_x", "force_y", "force_z", "torque_z", "f1_acc_z", "f1_gyro_x", "f1_acc_y", "f1_gyro_z"')
     parser.add_argument('--case',
                         default='success',
                         type=str,

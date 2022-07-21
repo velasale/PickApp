@@ -380,9 +380,11 @@ def main():
 
     main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
 
+    main_local = 'C:/Users/15416/Documents/Temporal/RAL data/'
+
     # dataset = '1_proxy_rob537_x1/'
-    dataset = '3_proxy_winter22_x1/'
-    # dataset = '5_real_fall21_x1/'
+    # dataset = '3_proxy_winter22_x1/'
+    dataset = '5_real_fall21_x1/'
 
     stages = ['GRASP/', 'PICK/']
 
@@ -447,7 +449,7 @@ def main():
     #     augmentations = 20
     #     location = main + dataset + stage
     #     location_3 = location + 'new_pp3_joined/'
-    #     location_4 = location + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
+    #     location_4 = main_local + dataset + stage + 'fixed_pp4_augmented/augmented x' + str(augmentations) + '/'
     #
     #     for filename in os.listdir(location_3):
     #         # print(filename)
@@ -463,21 +465,21 @@ def main():
     # --- Step 8: Save csvs in subfolders labeled ---
 
     print("\nStep 4: Saving data in labeled folders...")
-    # for stage in tqdm(stages):
-    #     location = main + dataset + stage
-    #
-    #     location_4 = location + 'fixed_pp4_augmented/augmented x1/'
-    #     location_5 = location + 'fixed_pp5_labeled/augmented x1/'
-    #     metadata_loc = main + dataset + 'metadata/'
-    #
-    #     data_into_labeled_folder(dataset, metadata_loc, location_4, location_5)
+    for stage in tqdm(stages):
+        location = main_local + dataset + stage
+
+        location_4 = location + 'fixed_pp4_augmented/augmented x20/'
+        location_5 = location + 'fixed_pp5_labeled/augmented x20/'
+        metadata_loc = main + dataset + 'metadata/'
+
+        data_into_labeled_folder(dataset, metadata_loc, location_4, location_5)
 
 
     # --- Step 9: Sparse data in the training and testing set
 
     print("\nStep 5: Sparsing data in training and testing sets...")
-    training_size = 0.7
-    create_sets(main, dataset, training_size)
+    # training_size = 0.7
+    # create_sets(main_local, dataset, training_size)
 
 
 if __name__ == '__main__':
