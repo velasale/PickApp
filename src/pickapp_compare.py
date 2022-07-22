@@ -321,7 +321,12 @@ def pic_list(file, variable):
 
     # Step 3: Subtract reference reading to all channels to ease comparison
     # time = df[:, 0] - initial_time
-    time = df['# elapsed time'] - initial_time
+
+    if '_states' in file:
+        time = df['# elapsed_time'] - initial_time
+    else:
+        time = df['# elapsed time'] - initial_time
+
     # value = df[:, variable] - initial_value
     value = df[variable] - initial_value
 
@@ -565,6 +570,9 @@ def topic_from_variable(variable):
     f1_imu_variables = [' f1_acc_x', ' f1_acc_y', ' f1_acc_z', ' f1_gyro_x', ' f1_gyro_y', ' f1_gyro_z']
     f2_imu_variables = [' f2_acc_x', ' f2_acc_y', ' f2_acc_z', ' f2_gyro_x', ' f2_gyro_y', ' f2_gyro_z']
     f3_imu_variables = [' f3_acc_x', ' f3_acc_y', ' f3_acc_z', ' f3_gyro_x', ' f3_gyro_y', ' f3_gyro_z']
+    f1_states_variables = [' f1_state_position', ' f1_state_speed', ' f1_state_effort']
+    f2_states_variables = [' f2_state_position', ' f2_state_speed', ' f2_state_effort']
+    f3_states_variables = [' f3_state_position', ' f3_state_speed', ' f3_state_effort']
 
     topic = ''
     if variable in wrench_variables:
@@ -575,6 +583,12 @@ def topic_from_variable(variable):
         topic = 'f2_imu'
     elif variable in f3_imu_variables:
         topic = 'f3_imu'
+    elif variable in f1_states_variables:
+        topic = 'f1_states'
+    elif variable in f2_states_variables:
+        topic = 'f2_states'
+    elif variable in f3_states_variables:
+        topic = 'f3_states'
 
     return topic
 
@@ -594,7 +608,12 @@ def main():
     parser.add_argument('--variable',
                         default='force_z',
                         type=str,
-                        help='Channel of interest: "force_x", "force_y", "force_z", "torque_z", "f1_acc_z", "f1_gyro_x", "f1_acc_y", "f1_gyro_z"')
+                        help='Channel of interest: \
+                              "force_x", "force_y", "force_z",\
+                              "torque_x", "torque_y", torque_z", \
+                              "f1_acc_x", f1_acc_y", "f1_acc_z", \
+                              "f1_gyro_x", "f1_gyro_y", "f1_gyro_z",\
+                              "f1_state_position", "f1_state_speed", "f1_state_effort"')
     parser.add_argument('--case',
                         default='success',
                         type=str,
@@ -611,8 +630,8 @@ def main():
     phase = args.phase
 
     # --- Data Location ---
-    main = os.path.dirname(os.getcwd()) + '/data/datasets/'
-    # main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
+    # main = os.path.dirname(os.getcwd()) + '/data/datasets/'     # Alejo's laptop main location
+    main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'   # Box location
     datasets = ['3_proxy_winter22_x1', '5_real_fall21_x1']
     subfolder = '/metadata/'
 
