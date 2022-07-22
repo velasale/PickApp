@@ -307,7 +307,7 @@ def pic_list(file, variable):
     df = pd.read_csv(file)
     # df = np.array(df)
 
-    # --- Step 2: Read the reference readings (whether initial or last) to ease the comparison
+    # --- Step 2: Read the reference readings (whether initial or last) to ease the comparison with DTW
     # Reference value
     initial_value = 0
     if '/GRASP/' in file:
@@ -329,7 +329,7 @@ def pic_list(file, variable):
     # value = df[:, variable] - initial_value
     value = df[variable] - initial_value
 
-    return time, value
+    return time, value, initial_value
 
 
 def crossings(x, y):
@@ -479,10 +479,10 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
 
         # --- Step 2 - Read data ---
         # A - Successful
-        real_pick_time, real_pick_value = pic_list(real_location_pick, variable)
-        real_grasp_time, real_grasp_value = pic_list(real_location_grasp, variable)
-        proxy_pick_time, proxy_pick_value = pic_list(proxy_location_pick, variable)
-        proxy_grasp_time, proxy_grasp_value = pic_list(proxy_location_grasp, variable)
+        real_pick_time, real_pick_value, real_pick_init_value = pic_list(real_location_pick, variable)
+        real_grasp_time, real_grasp_value, real_grasp_init_value = pic_list(real_location_grasp, variable)
+        proxy_pick_time, proxy_pick_value, proxy_pick_init_value = pic_list(proxy_location_pick, variable)
+        proxy_grasp_time, proxy_grasp_value, proxy_grasp_init_value = pic_list(proxy_location_grasp, variable)
 
         # --- Step 3: Dynamic Time Warping ---
         if phase == 'pick':
@@ -511,13 +511,14 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
             best_alignment = alignment
             best_pair = [real, proxy]
             best_real_grasp_time = real_grasp_time
-            best_real_grasp_value = real_grasp_value
             best_proxy_grasp_time = proxy_grasp_time
-            best_proxy_grasp_value = proxy_grasp_value
             best_real_pick_time = real_pick_time
-            best_real_pick_value = real_pick_value
             best_proxy_pick_time = proxy_pick_time
-            best_proxy_pick_value = proxy_pick_value
+            # Add again the initial values in order to plot the original data
+            best_real_grasp_value = real_grasp_value + real_grasp_init_value
+            best_proxy_grasp_value = proxy_grasp_value + proxy_grasp_init_value
+            best_real_pick_value = real_pick_value + real_pick_init_value
+            best_proxy_pick_value = proxy_pick_value + proxy_pick_init_value
             # print(real, proxy, alignment.distance)
 
     # --- Array of Plots (Grasp and Pick) ---
@@ -610,9 +611,11 @@ def main():
                         help='Channel of interest: \
                               "force_x", "force_y", "force_z",\
                               "torque_x", "torque_y", torque_z", \
-                              "f1_acc_x", f1_acc_y", "f1_acc_z", \
+                              "f1_acc_x", "f1_acc_y", "f1_acc_z", \
                               "f1_gyro_x", "f1_gyro_y", "f1_gyro_z",\
-                              "f1_state_position", "f1_state_speed", "f1_state_effort"')
+                              "f1_state_position", "f1_state_speed", "f1_state_effort",\
+                              "f2_state_position", "f2_state_speed", "f2_state_effort",\
+                              "f3_state_position", "f3_state_speed", "f3_state_effort"')
     parser.add_argument('--case',
                         default='success',
                         type=str,
@@ -624,7 +627,7 @@ def main():
     args = parser.parse_args()
 
     # --- Variable & Topic ---
-    variable = ' ' + args.variable
+    variable = ' ' + args.variable      # naming syntax bug
     case = args.case
     phase = args.phase
 
