@@ -303,19 +303,18 @@ def pic_list(file, variable):
     :return: Simplified lists (Time list, and values list)
     """
 
-    # Step 1: Turn csv into pandas - dataframe
+    # --- Step 1: Turn csv into pandas - dataframe
     df = pd.read_csv(file)
     # df = np.array(df)
 
-    # Step 2: Read the reference readings (whether initial or last) to make the offset
+    # --- Step 2: Read the reference readings (whether initial or last) to ease the comparison
     # Reference value
-    if variable == " force_z" or variable == " f1_acc_z":
-        if '/GRASP/' in file:
-            initial_value = df.iloc[-1][variable]
-        if '/PICK/' in file:
-            initial_value = df.iloc[0][variable]
-    else:
-        initial_value = 0
+    initial_value = 0
+    if '/GRASP/' in file:
+        initial_value = df.iloc[-1][variable]
+    if '/PICK/' in file:
+        initial_value = df.iloc[0][variable]
+
     # Reference time
     initial_time = df.iloc[0][0]
 
@@ -542,7 +541,7 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
 
     # --- Display the best alignment pair ---
     print("The closest pair was:")
-    print(best_pair[0], best_pair[1], round(best_alignment.distance,0))
+    print("Real Pick: ", best_pair[0], " Proxy Pick: ", best_pair[1], " DTW score: ", round(best_alignment.distance,0))
     # TODO
     # best_alignment.plot(type="alignment")
     best_alignment.plot(type="threeway")
