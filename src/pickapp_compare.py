@@ -17,6 +17,8 @@ from collections import defaultdict
 import tqdm
 import dtw
 from dtw import *
+
+
 # from dtaidistance import dtw
 # from dtaidistance import dtw_visualisation as dtwvis
 
@@ -47,7 +49,6 @@ def pick_info_from_metadata(location, file, index):
 
     rows = []
     with open(location + file) as csv_file:
-
         csv_reader = csv.reader(csv_file, delimiter=',')
 
         for row in csv_reader:
@@ -80,49 +81,31 @@ def same_pose_picks(real_picks_location, proxy_picks_location, label):
         # Step 2: Open metadata and get the label
         real_outcome = pick_info_from_metadata(real_picks_location, file, 10)
 
-        proxy_id = '1'
+        # Step 3: Only consider the real_picks which have the same result as "label"
+        if real_outcome == label:
 
-        for file_prox in os.listdir(proxy_picks_location):
+            for file_prox in os.listdir(proxy_picks_location):
 
-            name = str(file_prox)
-            start = name.index('pick')
+                name = str(file_prox)
+                start = name.index('pick')
 
-            # First digit that relates to the real-picks
-            end = name.index('-')
-            number_proxy = name[start + 4:end]
+                # First digit that relates to the real-picks
+                end = name.index('-')
+                number_proxy = name[start + 4:end]
 
-            # Entire digit
-            end = name.index('_m')
-            number_proxy_noise = name[start + 4:end]
+                # Entire digit
+                end = name.index('_m')
+                number_proxy_noise = name[start + 4:end]
 
-            # Only open those that have the same number
-            if number_proxy == number_real:
+                # Only open those that have the same number (same initial pose)
+                if number_proxy == number_real:
 
-                proxy_outcome = pick_info_from_metadata(proxy_picks_location, file_prox, 10)
-                proxy_noise = pick_info_from_metadata(proxy_picks_location, file_prox, 16)
+                    proxy_outcome = pick_info_from_metadata(proxy_picks_location, file_prox, 10)
 
-                b = ast.literal_eval(proxy_noise)
-                c = list(b)
-
-                # Heuristics of the amount of noise
-                cart_noise = abs(c[0]) + abs(c[1]) + abs(c[2])
-                ang_noise = abs(c[3]) + abs(c[4]) + abs(c[5])
-
-                if real_outcome == proxy_outcome:
-                    proxy_id = number_proxy_noise
-
-                    # TODO
-                    # print("\nThere is a match:")
-                    # print(proxy_outcome)
-                    # print(file)
-                    # print(file_prox)
-                    # print('Cart noise is:', cart_noise)
-                    # print('Ang noise is:', ang_noise)
-
-                # NOTE: Unindent twice this if
-                if not proxy_id == '1' and real_outcome == label:
-                    proxy_list.append(proxy_id)
-                    real_list.append(int(number_real))
+                    if real_outcome == proxy_outcome:
+                        proxy_id = number_proxy_noise
+                        proxy_list.append(proxy_id)
+                        real_list.append(int(number_real))
 
     # Returns lists of Real and Proxy Picks that had the same pose
     return real_list, proxy_list
@@ -187,7 +170,7 @@ def same_pose_lowest_noise_picks(real_picks_location, proxy_picks_location, labe
                 ang_noise = abs(c[3]) + abs(c[4]) + abs(c[5])
 
                 if cart_noise < cart_lowest_noise and ang_noise < ang_lowest_noise and real_outcome == proxy_outcome:
-                # if real_outcome == proxy_outcome:
+                    # if real_outcome == proxy_outcome:
                     cart_lowest_noise = cart_noise
                     ang_lowest_noise = ang_noise
                     proxy_id = number_proxy_noise
@@ -267,7 +250,6 @@ def agg_linear_trend(x):
     # chunk_len = 5
     # f_agg = 'min'
 
-
     if f_agg not in calculated_agg or chunk_len not in calculated_agg[f_agg]:
         if chunk_len >= len(x):
             calculated_agg[f_agg][chunk_len] = np.NaN
@@ -343,7 +325,7 @@ def crossings(x, y):
     # --- Step 1: Check the zero crossings of the time-series signal ---
     yy = y - 1  # Small offset to avoid many crossings at zero
     zero_crossings = np.where(np.diff(np.sign(yy)))[0]
-    tc = []         # tc: time of crossings
+    tc = []  # tc: time of crossings
     tc_idx = []
     previous = 0
     for zc in zero_crossings:
@@ -390,7 +372,7 @@ def crossings(x, y):
         while len(tcb) < 2:
             # print('**************************************************************')
             tcb.append(x_init + 0.5)
-            tcb_idx.append(len(x)-1)
+            tcb_idx.append(len(x) - 1)
 
         x_end = tcb[1]
         x_end_idx = tcb_idx[1]
@@ -440,7 +422,7 @@ def pick_subplot(axrray, phase, real_times, real_values, proxy_times, proxy_valu
         ax.annotate(phase, xy=(0, -0.8), size=15)
 
 
-def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phase):
+def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phase, specific_pick):
     """
     Compares the apple picks element-wise from the reals and proxys lists
     :param phase: when the dynamic time warping is going to take place
@@ -456,7 +438,7 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
 
     dtw_comparison = []
     distances = []
-    best_alignment_distance = 5000       # Start with a high value
+    best_alignment_distance = 5000  # Start with a high value
 
     topic = topic_from_variable(variable)
 
@@ -478,7 +460,6 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
         proxy_location_grasp = main + datasets[0] + '/GRASP/' + subfolder + '/' + case + '/' + proxy_grasp_file
 
         # --- Step 2 - Read data ---
-        # A - Successful
         real_pick_time, real_pick_value, real_pick_init_value = pic_list(real_location_pick, variable)
         real_grasp_time, real_grasp_value, real_grasp_init_value = pic_list(real_location_grasp, variable)
         proxy_pick_time, proxy_pick_value, proxy_pick_init_value = pic_list(proxy_location_pick, variable)
@@ -496,30 +477,59 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
             e, f, g, h = crossings(proxy_grasp_time, proxy_grasp_value)
             proxys = proxy_grasp_value[g:h]
 
-
         try:
             alignment = dtw(proxys, reals, keep_internals=True)
         except IndexError:
             alignment = dtw(10000, 0, keep_internals=True)
 
-        # print(real, proxy, alignment.distance)
         dtw_comparison.append([real, proxy, alignment.distance])
         distances.append(alignment.distance)
 
+        # --- Step 4: Add the initial values again (as before the DTW analyses)
+        real_grasp_value = real_grasp_value + real_grasp_init_value
+        proxy_grasp_value = proxy_grasp_value + proxy_grasp_init_value
+        real_pick_value = real_pick_value + real_pick_init_value
+        proxy_pick_value = proxy_pick_value + proxy_pick_init_value
+
+        # For Debugging - print each pair to compare
+
+        # Plot a specific pick
+        # --- Array of Plots (Grasp and Pick) ---
+        if proxy_pick == specific_pick:
+            f, axrray = plt.subplots(1, 2, figsize=(10, 4), dpi=100, sharey=True)
+            plt.subplots_adjust(wspace=0.05, hspace=0.175)
+
+            # Plot the grasp phase
+            pick_subplot(axrray, 'Grasp',
+                         real_grasp_time, real_grasp_value, proxy_grasp_time, proxy_grasp_value,
+                         variable)
+            # Plot pick phase
+            pick_subplot(axrray, 'Pick',
+                         real_pick_time, real_pick_value, proxy_pick_time, proxy_pick_value, variable)
+
+            plt.suptitle('Comparison of (' + case + ') Real pick No.' + str(real_pick) + ' and Proxy pick No.'
+                         + str(proxy_pick) + '\nDynamic Time Warping distance: ' + str(round(alignment.distance, 0)), y=1)
+
+        # --- Step 4: Track the pair of Real and Proxy picks that had the closest  DTW alignment
         if alignment.distance < best_alignment_distance:
             best_alignment_distance = alignment.distance
             best_alignment = alignment
             best_pair = [real, proxy]
+            # X axes - Time
             best_real_grasp_time = real_grasp_time
             best_proxy_grasp_time = proxy_grasp_time
             best_real_pick_time = real_pick_time
             best_proxy_pick_time = proxy_pick_time
-            # Add again the initial values in order to plot the original data
-            best_real_grasp_value = real_grasp_value + real_grasp_init_value
-            best_proxy_grasp_value = proxy_grasp_value + proxy_grasp_init_value
-            best_real_pick_value = real_pick_value + real_pick_init_value
-            best_proxy_pick_value = proxy_pick_value + proxy_pick_init_value
+            # Y axes - Values
+            best_real_grasp_value = real_grasp_value
+            best_proxy_grasp_value = proxy_grasp_value
+            best_real_pick_value = real_pick_value
+            best_proxy_pick_value = proxy_pick_value
+            # For Debugging
             # print(real, proxy, alignment.distance)
+
+    # For Debugging
+    # print("DTW:   ", dtw_comparison)
 
     # --- Array of Plots (Grasp and Pick) ---
     f, axrray = plt.subplots(1, 2, figsize=(10, 4), dpi=100, sharey=True)
@@ -542,7 +552,8 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
 
     # --- Display the best alignment pair ---
     print("The closest pair was:")
-    print("Real Pick: ", best_pair[0], " Proxy Pick: ", best_pair[1], " DTW score: ", round(best_alignment.distance,0))
+    print("Real Pick: ", best_pair[0], " Proxy Pick: ", best_pair[1], " DTW score: ", round(best_alignment.distance, 0),
+          "\n")
     # TODO
     # best_alignment.plot(type="alignment")
     best_alignment.plot(type="threeway")
@@ -552,7 +563,7 @@ def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phas
     header = ['real', 'proxy', 'dtw']
     name = variable + '__during__' + phase + '.csv'
     target_dir = os.path.dirname(os.getcwd()) + '/results/'
-    with open(target_dir + name, 'w') as file:
+    with open(target_dir + name, 'w', newline='') as file:
         write = csv.writer(file)
         write.writerow(header)
         write.writerows(dtw_comparison)
@@ -624,16 +635,22 @@ def main():
                         default='pick',
                         type=str,
                         help='Phase to do the Dynamic Time Warping analysis: "grasp", "pick"')
+
+    parser.add_argument('--specific_pick',
+                         default='',
+                         type=str,
+                         help='Specific proxy pick number that you would like to see the comparison with real (e.g.64-10)')
     args = parser.parse_args()
 
     # --- Variable & Topic ---
-    variable = ' ' + args.variable      # naming syntax bug
+    variable = ' ' + args.variable  # naming syntax bug
     case = args.case
     phase = args.phase
+    specific_pick = args.specific_pick
 
     # --- Data Location ---
     # main = os.path.dirname(os.getcwd()) + '/data/datasets/'     # Alejo's laptop main location
-    main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'   # Box location
+    main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'  # Box location
     datasets = ['3_proxy_winter22_x1', '5_real_fall21_x1']
     subfolder = '/metadata/'
 
@@ -642,16 +659,20 @@ def main():
 
     # --- Get comparable picks from real and proxy picks
     real_picks, proxy_picks = same_pose_picks(real_picks_location, proxy_picks_location, case[0])
+    # real_picks, proxy_picks = same_pose_lowest_noise_picks(real_picks_location, proxy_picks_location, case[0])
+
+    # For Debugging
+    print("Real Picks", real_picks)
+    print("\nProxy Picks", proxy_picks)
 
     subfolder = '__for_proxy_real_comparison'
-    compare_picks(real_picks, proxy_picks, main, datasets, subfolder, case, variable, phase)
+    compare_picks(real_picks, proxy_picks, main, datasets, subfolder, case, variable, phase, specific_pick)
 
     plt.show()
 
 
 if __name__ == "__main__":
     main()
-
 
     # TODO
     # -------------------------------------------- Step 3 - Get some features ------------------------------------------
