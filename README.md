@@ -27,9 +27,9 @@ $ python pickapp_data.py --help
 
 ## Examples
 ### module: pickapp_compare.py
-The following example analyzes *variable* 'Force_x', among the 'failed' picks *case*, and does the Dynamic Time Warping (DTW) analysis during the 'pick' *phase*.
+The following example analyzes *variable* 'Force_z', among the 'failed' picks *case*, and does the Dynamic Time Warping (DTW) analysis during the 'pick' *phase*.
 ```
-$ python pickapp_compare.py --variable force_z --case failed --phase pick
+$ python pickapp_compare.py --variable force_z --case failed --phase pick --specific_pick 64-10
 ```
 It outputs a time-series plot with the closest real and proxy picks.
 It also outputs a .csv file with a list of the real and proxy picks that are comparable. Comparable picks are the ones where the pose of the robot with respect to the apple is the same.
