@@ -406,20 +406,26 @@ def pick_subplot(axrray, phase, real_times, real_values, proxy_times, proxy_valu
 
     ax = axrray[position]
     ax.grid()
-    ax.plot(real_times, real_values, label='Real', color="#de8f05")
-    ax.plot(proxy_times, proxy_values, label='Proxy', color="#0173b2")
+    ax.plot(real_times, real_values, label='Real', color="#de8f05", linewidth=2)
+    ax.plot(proxy_times, proxy_values, label='Proxy', color="#0173b2", linewidth=2)
     ax.legend(loc=legend_loc)
 
     # Place ylabel only in the left subplot
     if phase == 'Grasp':
-        ax.set_ylabel(variable)
+        ax.set_ylabel(variable, fontsize=15)
 
     # Location of the Pick and Grasp Labels
     y_max = max(np.max(real_values), np.max(proxy_values))
-    if y_max > 1:
-        ax.annotate(phase, xy=(0, 0.8 * y_max), size=15)
-    else:
-        ax.annotate(phase, xy=(0, -0.8), size=15)
+
+    # Tweaks for the plots of the paper
+    ax.annotate(phase, xy=(0, 10), size=15)
+    ax.tick_params(labelsize=15)
+
+    # Uncomment the following lines for purposes other than plots for paper
+    # if y_max > 1:
+    #     ax.annotate(phase, xy=(0, 0.8 * y_max), size=15)
+    # else:
+    #     ax.annotate(phase, xy=(0, -0.8), size=15)
 
 
 def compare_picks(reals, proxys, main, datasets, subfolder, case, variable, phase, specific_pick):
@@ -662,8 +668,8 @@ def main():
     # real_picks, proxy_picks = same_pose_lowest_noise_picks(real_picks_location, proxy_picks_location, case[0])
 
     # For Debugging
-    print("Real Picks", real_picks)
-    print("\nProxy Picks", proxy_picks)
+    # print("Real Picks", real_picks)
+    # print("\nProxy Picks", proxy_picks)
 
     subfolder = '__for_proxy_real_comparison'
     compare_picks(real_picks, proxy_picks, main, datasets, subfolder, case, variable, phase, specific_pick)

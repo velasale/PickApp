@@ -253,9 +253,7 @@ def kurtosis(x):
     return pd.Series.kurtosis(x)
 
 
-
 # Other Functions
-
 def adjust_box_widths(g, fac):
     """
     Adjust the withs of a seaborn-generated boxplot.
@@ -306,7 +304,11 @@ def pic_list(file, variable):
 
     # Subtract initial reading to all channels to ease comparison
     # time = df[:, 0] - initial_time
-    time = df['# elapsed time'] - initial_time
+    try:
+        time = df['# elapsed time'] - initial_time
+    except KeyError:
+        time = df['# elapsed_time'] - initial_time
+
     # value = df[:, variable] - initial_value
     value = df[variable] - initial_value
 
@@ -633,121 +635,6 @@ def temporal(locations, topic, variable, chunk):
     return peak_values, aucs, slopes, agg_lins, shapes_frec
 
 
-def rfc(X_train_list, y_train_list, X_test_list, y_test_list):
-
-    # ------------ Train Random Forest Classifier -----------
-    X_train = np.array(X_train_list)
-    # print(len(X_train))
-    X = X_train.reshape(-1, 1)
-    # print(X_train)
-
-    y_train = np.array(y_train_list)
-
-    clf = MLPClassifier(solver='adam', random_state=None, max_iter=2000, hidden_layer_sizes=50)
-    # clf = RandomForestClassifier(max_depth=10, random_state=0)
-    clf.fit(X, y_train)
-
-    # ------------- Test it! ---------------------------------
-    X_test = np.array(X_test_list)
-    X_val = X_test.reshape(-1, 1)
-    y_val = np.array(y_test_list)
-
-    performance = 0
-    true_positives = 0
-    false_positives = 0
-    false_negatives = 0
-    true_negatives = 0
-    for j, k in zip(X_val, y_val):
-        grasp_prediction = clf.predict([j])
-        # print(grasp_prediction)
-
-        if grasp_prediction == k:
-            # print("yeahh")
-            performance += 1
-
-            if grasp_prediction == 1:
-                true_positives += 1
-            else:
-                true_negatives += 1
-        else:
-            if grasp_prediction == 1:
-                false_positives += 1
-            else:
-                false_negatives += 1
-
-    result = performance / len(X_test)
-    print("\nClassifier: Random Forest")
-    # print("Parameters: %i tsfresh features" % n_features)
-    print("Accuracy: %.2f" % result)
-    print("Confusion Matrix")
-    print("                  Reference      ")
-    print("Prediction    Success     Failure")
-    print("   Success       %i          %i" % (true_positives, false_positives))
-    print("   Failure       %i          %i" % (false_negatives, true_negatives))
-    print('\n')
-
-
-def simple_classifier(X_train_list, y_train_list, X_test_list, y_test_list):
-
-    success = []
-    failed = []
-    # Get the mean of the successful
-    for x, y in zip(X_train_list, y_train_list):
-        if y == 1:
-            success.append(x)
-        else:
-            failed.append(x)
-
-    # Get the means:
-
-    success_mean = np.mean(success)
-    failed_mean = np.mean(failed)
-
-    threshold = (success_mean + failed_mean)/2
-    print(threshold)
-
-    # Classify
-    performance = 0
-    true_positives = 0
-    false_positives = 0
-    false_negatives = 0
-    true_negatives = 0
-    for j, k in zip(X_test_list, y_test_list):
-
-        if j < threshold:
-            grasp_prediction = 0
-        else:
-            grasp_prediction = 1
-
-        # grasp_prediction = clf.predict([j])
-        print(grasp_prediction)
-
-        if grasp_prediction == k:
-            # print("yeahh")
-            performance += 1
-
-            if grasp_prediction == 1:
-                true_positives += 1
-            else:
-                true_negatives += 1
-        else:
-            if grasp_prediction == 1:
-                false_positives += 1
-            else:
-                false_negatives += 1
-
-    result = performance / len(X_test_list)
-    print("\nClassifier: Random Forest")
-    # print("Parameters: %i tsfresh features" % n_features)
-    print("Accuracy: %.2f" % result)
-    print("Confusion Matrix")
-    print("                  Reference      ")
-    print("Prediction    Success     Failure")
-    print("   Success       %i          %i" % (true_positives, false_positives))
-    print("   Failure       %i          %i" % (false_negatives, true_negatives))
-    print('\n')
-
-
 if __name__ == "__main__":
 
     # --- Data Location
@@ -757,8 +644,8 @@ if __name__ == "__main__":
     subfolder = '__for_proxy_real_comparison'
 
     # --- Variable that we wish to analyze
-    variables = [' force_z', ' f1_acc_z', ' f2_acc_z', ' f1_gyro_x']
-    variable = variables[0]
+    variables = [' force_z', ' f1_acc_z', ' f2_acc_z', ' f1_gyro_x', ' f2_state_effort']
+    variable = variables[4]
 
     # Assign the topic
     if variable == ' force_z' or variables == ' force_x' or variables == ' force_y' or variable == ' torque_z':
@@ -769,6 +656,8 @@ if __name__ == "__main__":
         topic = 'f2_imu'
     elif variable == ' f3_acc_x' or variable == ' f3_acc_y' or variable == ' f3_acc_z' or variable == ' f3_gyro_x':
         topic = 'f3_imu'
+    elif variable ==' f2_state_effort':
+        topic = 'f2_states'
 
     # --- Qualitative Comparison of Real vs Proxy ---
     # Similar Failed Picks: place Proxy Pics in column 0, and Real Pics in column 1
@@ -926,42 +815,3 @@ if __name__ == "__main__":
     # count_plot(proxy_picks_shapes, real_picks_shapes, case, variable)
 
     plt.show()
-
-    # # ... Run classifier
-    # # Training Set
-    # X_train_f = failed_train_set
-    # y_train_f = [0]*len(X_train_f)
-    #
-    # X_train_s = success_train_set
-    # y_train_s = [1]*len(X_train_s)
-    #
-    # X_train = X_train_f + X_train_s
-    # y_train = y_train_f + y_train_s
-    #
-    # # Validation Set
-    # X_val_f = failed_val_set
-    # y_val_f = [0] * len(X_val_f)
-    #
-    # X_val_s = success_val_set
-    # y_val_s = [1] * len(X_val_s)
-    #
-    # X_val = X_val_f + X_val_s
-    # y_val = y_val_f + y_val_s
-    #
-    # print('Traini set')
-    # print(X_train)
-    # print(y_train)
-    #
-    #
-    # print('Validation set')
-    # print(X_val)
-    # print(y_val)
-    #
-    #
-    #
-    # print(av, it)
-    # print(av_list)
-    #
-    # rfc(X_train, y_train, X_val, y_val)
-    #
-    # # simple_classifier(X_train, y_train, X_val, y_val)
