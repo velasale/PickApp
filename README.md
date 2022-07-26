@@ -38,6 +38,7 @@ The following example analyzes *variable* 'Force_z', among the 'failed' picks *c
 $ python pickapp_compare.py --variable force_z --case failed --phase pick --specific_pick 64-10
 ```
 It outputs a time-series plot with the closest real and proxy picks.
+I also outputs a time-series plot comparing the proxy pick 64-10 with the real pick 64.
 It also outputs a .csv file with a list of the real and proxy picks that are comparable. Comparable picks are the ones where the pose of the robot with respect to the apple is the same.
 These files are stored in the sub-folder **results**.
 

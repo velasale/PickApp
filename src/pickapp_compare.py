@@ -645,7 +645,7 @@ def main():
     parser.add_argument('--specific_pick',
                          default='',
                          type=str,
-                         help='Specific proxy pick number that you would like to see the comparison with real (e.g.64-10)')
+                         help='Specific proxy pick number that you would like to compare with its respective real pick (e.g.64-10)')
     args = parser.parse_args()
 
     # --- Variable & Topic ---
