@@ -32,10 +32,23 @@ python pickapp_data.py --help
 
 
 ## Examples
+### module: pickapp_main.py
+Note: Before running rosserial, make sure that the USB device is connected before starting the docker container
+```
+rosrun rosserial_python serial_node.py
+```
+
+```
+rosrun PickApp pickapp_main.py
+```
+
+
+
+
 ### module: pickapp_compare.py
 The following example analyzes *variable* 'Force_z', among the 'failed' picks *case*, and does the Dynamic Time Warping (DTW) analysis during the 'pick' *phase*.
 ```
-$ python pickapp_compare.py --variable force_z --case failed --phase pick --specific_pick 64-10
+python pickapp_compare.py --variable force_z --case failed --phase pick --specific_pick 64-10
 ```
 It outputs a time-series plot with the closest real and proxy picks.
 I also outputs a time-series plot comparing the proxy pick 64-10 with the real pick 64.
@@ -48,7 +61,7 @@ These files are stored in the sub-folder **results**.
 ### module: pickapp_learning.py
 The following example runs a Random Forest Classifier (RFC), with 10 *experiments* to account for the classifier's stochasticity, with a *depth* of 5 branches, and utilizes 5 *features*.
 ```
-$ python pickapp_learning.py --experiments 10 --depth 5 --feature 5 --classifier rfc 
+python pickapp_learning.py --experiments 10 --depth 5 --feature 5 --classifier rfc 
 ```
 It outputs a boxplot with the classifier's accuracies during the experiments.
 The boxplot gets stored in a .pdf file, along with a .txt file with the confusion matrix of the best accuracy.
@@ -59,7 +72,7 @@ These files are stored in the sub-folder **results**.
 ### module: pickapp_stats.py
 In the following example, the statistic analysis is run for the dataset *3_proxy_winter22_x1*.
 ```html
-$ python pickapp_stats.py --dataset 3_proxy_winter22_x1
+python pickapp_stats.py --dataset 3_proxy_winter22_x1
 ```
 It outputs .pdfs with box-plots of the angular and cartesian noise.
 It also outputs a .txt file with Mean, SD and percentiles of each noise.
