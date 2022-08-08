@@ -940,7 +940,7 @@ class AppleProxyExperiment(object):
                       second_pose.orientation.w]
 
         roll, pitch, yaw = euler_from_quaternion(quaternion)
-
+https://github.com/cravetzm/Apple-Hand.git
         # roll = roll + 1 * (random() * angular_noise - angular_noise / 2)
         # pitch = pitch + 1 * (random() * angular_noise - angular_noise / 2)
         # yaw = yaw + 1 * (random() * angular_noise - angular_noise / 2)
@@ -964,14 +964,7 @@ class AppleProxyExperiment(object):
 
         # --- Step 3: Convert the pose back into the "Base_Link" reference frame
         sec_pose_stamped = tf2_geometry_msgs.PoseStamped()
-        sec_pose_stamped.pose = second_pose
-        sec_pose_stamped.header.frame_id = "tool0"
-        sec_pose_stamped.header.stamp = rospy.Time(0)
-
-        try:
-            # ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
-            output_pose_stamped = tf_buffer.transform(sec_pose_stamped, "base_link", rospy.Duration(1))
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+        sec_pose_stamped.pose = second_posehttps://github.com/cravetzm/Apple-Hand.gitectivityException, tf2_ros.ExtrapolationException):
             raise
 
         # --- Step 4: Finally move to the new position
@@ -1021,7 +1014,7 @@ class AppleProxyExperiment(object):
         try:
             # ** It is important to wait for the listener to start listening. Hence, the rospy.Duration(1)
             new_pose_at_world = tf_buffer.transform(pose_at_tool, self.ref_frame, rospy.Duration(1))
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+        except (tf2_ros.LookupException, tf2_ros.Connhttps://github.com/cravetzm/Apple-Hand.gitectivityException, tf2_ros.ExtrapolationException):
             raise
 
         # --- Step 4: Finally, move to the new position
@@ -1045,7 +1038,7 @@ class AppleProxyExperiment(object):
     def point_sampling(self):
         """
     This function samples points evenly distributed from the surface of a sphere
-    Source: https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
+    Source: https://stackoverflow.com/questions/96008https://github.com/cravetzm/Apple-Hand.git01/evenly-distributing-n-points-on-a-sphere
     """
         num_pts = 8 * 30
         indices = arange(0, num_pts, dtype=float) + 0.5
@@ -1101,7 +1094,7 @@ class AppleProxyExperiment(object):
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             raise
 
-        # --- Step 4: Finally, move to the new pose with noise
+        # --- Step 4: Finally, move to the new pose whttps://github.com/cravetzm/Apple-Hand.gitith noise
         self.move_group.set_pose_target(new_pose_at_world.pose)
         plan = self.move_group.go(wait=True)
         self.move_group.stop()
@@ -1125,10 +1118,7 @@ class AppleProxyExperiment(object):
 
         # --- Step 1: Read the current pose from the "Base_link" and convert it into "Tool0"
         # Listen to the tf topic
-        tf_buffer = tf2_ros.Buffer()
-        listener = tf2_ros.TransformListener(tf_buffer)
-        # Initiate pose object
-        pose_stamped = tf2_geometry_msgs.PoseStamped()
+        tf_buffer = tf2_ros.Buffer()https://github.com/cravetzm/Apple-Hand.git)
 
         # If angular noise is added BEFORE the cartesian noise:
         # pose_stamped.pose = self.ideal_pose
@@ -1596,10 +1586,7 @@ class AppleProxyExperiment(object):
 
 
 def main():
-    try:
-
-        # ------------------------------------- Step 1 - Initial Setup -------------------------------------------------
-        print("Apple Proxy experiments")
+    try:https://github.com/cravetzm/Apple-Hand.git
         apple_proxy_experiment = AppleProxyExperiment()
 
         # Specify whether you will be using the hand or not, to avoid the program from crashing
@@ -1620,12 +1607,7 @@ def main():
         # ---  Bring the robot to the scanned position and normal to the stem
         # print("--- Align Arm with Stem")
         # print("--- Press 'Enter' when ready")
-        # apple_proxy_experiment.align_with_stem()
-
-        # --- Read the csv file with all the angles from the real-apple picks [Hand-Stem, Stem-Gravity, Hand-gravity]
-        location = '/home/avl/PycharmProjects/AppleProxy/'
-        file = 'real_picks_angles_yaw.csv'
-        with open(location + file, 'r') as f:
+        # apple_proxy_experiment.align_with_stem()https://github.com/cravetzm/Apple-Hand.git
             reader = csv.reader(f)
             angles = list(reader)
 
@@ -1728,7 +1710,7 @@ def main():
                     # y_noise_range = [-0.03, -0.02, -0.01, 0.00, 0.01, 0.02, 0.03]
                     # z_noise_range = [-0.025, -0.02, -0.015, -0.01]
 
-                    # The original noise ranges were obtained with isolated noise. However, in reality noise happens
+                    # The original noise ranges were https://github.com/cravetzm/Apple-Hand.gitobtained with isolated noise. However, in reality noise happens
                     # simoultanenously. Thus, it's hard to obtain a combination that would lead to a certain percentage
                     # x_noise_range = [-0.040, -0.025, -0.010, 0.005, 0.020]
                     # y_noise_range = [-0.020, -0.010, +0.000, 0.010, 0.020]
@@ -1752,7 +1734,7 @@ def main():
 
                     # A final sweep of all the picks without ant noise
                     # apple_proxy_experiment.add_cartesian_noise(0, 0, 0)
-
+https://github.com/cravetzm/Apple-Hand.git
                     # --- Add angular noise
                     print("\nHit 'Enter' to add angular noise")
                     raw_input()
