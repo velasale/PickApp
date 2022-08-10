@@ -571,9 +571,9 @@ class AppleProxyExperiment(object):
         joint_goal = self.move_group.get_current_joint_values()
 
         # --- Preliminary position joint values
-        joint_goal[0] = -   0 * pi / 180
+        joint_goal[0] = -  11 * pi / 180
         joint_goal[1] = - 100 * pi / 180
-        joint_goal[2] = - 125 * pi / 180
+        joint_goal[2] = - 139 * pi / 180
         joint_goal[3] = - 100 * pi / 180
         joint_goal[4] = -  90 * pi / 180
         joint_goal[5] = 0
