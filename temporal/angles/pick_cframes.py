@@ -22,9 +22,6 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from mpl_toolkits import mplot3d
 
-def exam(x):
-    return x**2
-
 
 def set_axes_equal(ax):
     '''Make axes of 3D plot have equal scale so that spheres appear as spheres,
@@ -347,7 +344,7 @@ def draw_kmeans_in_base(i):
 if __name__ == '__main__':
 
     # ---------------------------------------- Step 1 - Read the csv files ---------------------------------------------
-    location = 'C:/Users/15416/PycharmProjects/PickApp/data/'
+    location = '/root/ur5_ws/src/PickApp/data/'
     # Read the csv file with all the coordinates in the hand's coordinate frame
     file = 'objects_in_hand.csv'
     with open(location + file, 'r') as f:
