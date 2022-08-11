@@ -251,14 +251,15 @@ def check_dist_to_stem(a, b, c, stm_p1, stm_p2, diameter):
 sym.init_printing()
 
 # Lab's PC location
-folder = '/home/avl/ur_ws/src/apple_proxy/coords/'
+local = '/root/ur5_ws/src/'
+folder = 'PickApp/data/real_apples/real_apples_fall21/coords/'
 file = 'apple_scan'
 
 apples = [0]*42
 
 for i in range(1, len(apples) + 1):
 
-    location = folder + file + str(i) + '.csv'
+    location = local + folder + file + str(i) + '.csv'
 
     # Lists to store the coordinates of the points
     app_p1 = []
@@ -271,7 +272,7 @@ for i in range(1, len(apples) + 1):
 
     with open(location, newline='') as csv_file:
         reader = csv.reader(csv_file)
-        next(reader, None)  # Skip the header.
+        next(reader, None)  # Skip the header
         for row in (reader):
             app_p1 = [float(row[2]), float(row[3]), float(row[4])]
             app_p2 = [float(row[5]), float(row[6]), float(row[7])]
@@ -311,6 +312,8 @@ for i in range(1, len(apples) + 1):
 print('The characteristics of the real apples picked are: ', apples)
 print('\nApple 2 scan: ', apples[1])
 
-with open('apple_list.csv', 'w') as f:
+target_file = local + folder + 'apple_list.csv'
+
+with open(target_file, 'w') as f:
     write = csv.writer(f)
     write.writerows(apples)
