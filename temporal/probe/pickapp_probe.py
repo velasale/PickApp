@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-This code is a tool to gather points in the real world, by using the UR5 as a probe,
-and with those points calculate the location of the center of the apple and the orientation of the stem
-with respect to the arm's base link
+This code is a tool to scan points in the real world, by using the UR5 as a probe.
+Later, the scanned points (coordinates) are used to calculate the location of the center of the apple and the orientation of the stem
+with respect to the arm's base link.
 """
 
 # System Related Packages
