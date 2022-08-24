@@ -1599,7 +1599,7 @@ def main():
     try:
 
         # ------------------------------------- Step 1 - Initial Setup -------------------------------------------------
-        print("Apple Proxy experiments")
+        
         apple_proxy_experiment = AppleProxyExperiment()
 
         # Specify whether you will be using the hand or not, to avoid the program from crashing
@@ -1607,13 +1607,19 @@ def main():
 
         apple_proxy_experiment.open_hand_service()
 
+        print("\n-------------------------------")
+        print("\n|   Apple Proxy experiments   |")
+        print("\n-------------------------------")
+        print("\n Stage 1: Initial Positioning of the robot w.r.t. the apples")
+
         # --- Initialize UR5 at home position if needed
-        print(" Press 'Enter' to move arm into the original UR5 home position")
-        raw_input()
-        # apple_proxy_experiment.go_home()
+        print("\n     Type 'yes' or 'no' to move arm into the original UR5 home position")
+        go = raw_input()
+        if go == "yes":
+            apple_proxy_experiment.go_home()            
 
         # --- Bring UR5 into a preliminary position to avoid weird poses
-        print(" Press 'Enter' to move arm into a preliminary starting position")
+        print("     Press 'Enter' to move arm into a preliminary starting position")
         raw_input()
         apple_proxy_experiment.go_preliminary_position()
 
@@ -1623,18 +1629,12 @@ def main():
         # apple_proxy_experiment.align_with_stem()
 
         # --- Read the csv file with all the angles from the real-apple picks [Hand-Stem, Stem-Gravity, Hand-gravity]
-        location = '/home/avl/PycharmProjects/AppleProxy/'
+        location = '/root/ur5_ws/src/PickApp/data/real_apples/real_apples_fall21/'
         file = 'real_picks_angles_yaw.csv'
         with open(location + file, 'r') as f:
             reader = csv.reader(f)
             angles = list(reader)
-
-        # Add index into each row of angles
-        # i = 1
-        # for pick in angles:
-        #     pick.append(i)
-        #     i += 1
-
+        
         # --- Sort the list according to the Stem-Gravity angle in order to simplify the proxy arrangement
         real_pick_angles = np.array(angles)
         real_pick_angles = real_pick_angles[np.argsort(real_pick_angles[:, 1])]
@@ -1644,6 +1644,7 @@ def main():
             write.writerows(real_pick_angles)
 
         # ----------------------------- Step 2 - Sweep all the real-apple picks ----------------------------------------
+        print("\n Stage 2: Replicating real apple pick poses within the proxyInitial Positioning of the robot w.r.t. the apples")
         for j in range(37, len(real_pick_angles)):
 
             # Avoid the picks in which the robot didn't find a solution within the Proxy
@@ -1678,10 +1679,10 @@ def main():
                 print("Scan the stem in the proxy")
                 apple_proxy_experiment.scan_apple_and_stem()
                 stem_to_gravity_at_proxy = apple_proxy_experiment.stem_to_gravity
-                print("\nResult: current Stem-Gravity angle in proxy is %.0f deg: " % stem_to_gravity_at_proxy)
+                print("\nResult: current Stem-Gravity angle in proxy is %.0f deg." % stem_to_gravity_at_proxy)
 
                 difference = stem_to_gravity_at_proxy - stem_gravity_angle
-                print("The difference with the real-apple pick is %.0f deg: " % difference)
+                print("The difference with the real-apple pick is %.0f deg." % difference)
 
             # Place Apple and Stem in RVIZ
             apple_proxy_experiment.place_apple_and_stem()
@@ -1927,7 +1928,7 @@ def main():
                     noise_at_tool = [x_noise, y_noise, z_noise, roll_noise, pitch_noise, 0]
                     csv_data[16] = noise_at_tool
                     # Final Pose
-                    apple_proxy_experiment.write_csv(csv_data, sub_name)
+                    #apple_proxy_experiment.write_csv(csv_data, sub_name)
 
                     # --- Open Gripper
                     print("::: Press 'Enter' to open the gripper :::")
