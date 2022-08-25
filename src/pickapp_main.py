@@ -5,9 +5,7 @@ around the apple.
 
 Alejandro Velasquez
 velasale@oregonstate.edu
-
 """
-# --- System related packages
 
 ## ---------------------------------------------------- LINE MAX LENGTH 125 CHAR--------------------------------------------#
 ## --- Standard Library Imports
@@ -40,7 +38,6 @@ from tf.transformations import euler_from_quaternion, quaternion_about_axis, qua
 import tf2_ros
 import tf2_geometry_msgs  # **Do not use geometry_msgs. Use this instead for PoseStamped
 from visualization_msgs.msg import Marker, MarkerArray
-
 
 
 def all_close(goal, actual, tolerance):
@@ -1641,10 +1638,10 @@ def main():
         file = 'real_picks_angles_yaw.csv'
         with open(location + file, 'r') as f:
             reader = csv.reader(f)
-            angles = list(reader)
+            real_angles = list(reader)
         
         # --- Sort the angles list according to the Stem-Gravity angle in order to simplify the proxy arrangement
-        real_pick_angles = np.array(angles)
+        real_pick_angles = np.array(real_angles)
         real_pick_angles = real_pick_angles[np.argsort(real_pick_angles[:, 1])]
         # Save list to a csv file
         with open('real_pick_sorted_list', 'w') as f:
@@ -1655,7 +1652,7 @@ def main():
         print("\n*** Stage 2: Replicating real apple pick poses within the proxy")
         for j in range(37, len(real_pick_angles)):
 
-            # Avoid the picks in which the robot didn't find a solution within the Proxy
+            # Avoid those picks where the robot didn't find a solution within the Proxy
             if j in [0, 1, 16, 17, 27, 31, 37, 41, 43, 48, 53, 54, 56, 57, 58, 64, 74, 75]:
                 continue
 
@@ -1674,16 +1671,15 @@ def main():
             stem_gravity_angle,
             hand_gravity_angle, yaw))
 
-            # ---  Scan Apple and Stem, and check that Stem-Gravity angle is close enough
-            # Stem-Gravity angle reference from the real apple pick
+            ## --- Scan Apple and Stem, and check that Stem-Gravity angle is close enough
             print("\nThe reference Stem-Gravity angle from the real pick is %.0f deg" % stem_gravity_angle)
-            # Stem-Gravity angle from the proxy
             print("The current Stem-Gravity angle in the proxy is %.0f deg" % apple_proxy_experiment.stem_to_gravity)
 
             difference = apple_proxy_experiment.stem_to_gravity - stem_gravity_angle
 
-            while abs(difference) > 10:         # Only re-scan if the difference is bigger than 10deg
-                print("You need to adjust the angle of the stem in the proxy...")
+            ## --- Only scan if the difference is bigger than a threshold (e.g. 10deg)
+            while abs(difference) > 10:         
+                print("You need to adjust the angle of the stem in the proxy ...")
                 print("Scan the stem in the proxy")
                 apple_proxy_experiment.scan_apple_and_stem()
                 stem_to_gravity_at_proxy = apple_proxy_experiment.stem_to_gravity
@@ -1692,27 +1688,29 @@ def main():
                 difference = stem_to_gravity_at_proxy - stem_gravity_angle
                 print("The difference with the real-apple pick is %.0f deg." % difference)
 
-            # Place Apple and Stem in RVIZ
+            ## --- Place Apple and Stem markers in RVIZ
             apple_proxy_experiment.place_apple_and_stem()
 
-            # Remind user to push Play in the pendant screen
+            ## --- Remind user to back-up the probe and push Play in the pendant screen
+            print("Backup the probe from the apple a little bit as a precaution, then hit 'Enter'")
+            raw_input()
             print("Push play in the pendant screen and then 'Enter'")
             raw_input()
 
-            # --- Replace Probe with the Gripper
+            ## --- Unmount Probe and Mount Gripper back on the robot's wrist
             apple_proxy_experiment.go_preliminary_position()
-            print("--- Replace Scanning probe with gripper")
+            print("--- Unmount Scanning Probe and mount Gripper on the robot's wrist")
             print("--- Press 'Enter' when ready")
             raw_input()
 
-            # --- Make sure to open hand before approaching apple
+            ## --- Make sure to open hand before approaching apple
             apple_proxy_experiment.open_hand_service()
 
-            # --- Make arm adopt the Hand-Stem and Hand-Gravity angles as in the real-apple picks
+            ## --- Make arm adopt the Hand-Stem and Hand-Gravity angles as in the real-apple picks
             print("\n... Placing arm w.r.t stem and gravity as in the real apple pick")
             angles = apple_proxy_experiment.hand_angles(hand_gravity_angle, hand_stem_angle, yaw)
 
-            # Check Max limits of noise
+            ## Check Max limits of noise
             # print("--- About to start adding cartesian noise")
             # print("--- Press 'Enter' when ready")
             # raw_input()
@@ -1722,15 +1720,16 @@ def main():
             # raw_input()
             # apple_proxy_experiment.ang_noise()
 
-            # --- 3rd - Perform 5 picks at each point, by adding random (uniformly distributed) noise at each:
+            ## --- Perform n picks at each point, by adding random (uniformly distributed) noise at each
             if angles:
                 for noise in range(13):
                     print("\n\n:::: Performing attempt %i/9 of real apple pick %i ::::" % (noise, index))
-                    # Perform 5 proxy picks with different noise at each of the reference real-apple picks
+                    # Perform n proxy picks with different noise at each of the reference real-apple picks
 
-                    # --- Add cartesian noise
+                    ## --- Add cartesian noise
                     print("\nHit 'Enter' to add cartesian noise")
                     raw_input()
+
                     # Noise Ranges obtained in the proxy [m]
                     # Original noise ranges - Obtained individually
                     # x_noise_range = [-0.05, -0.04, -0.03, 0.01, 0.02, 0.03]
@@ -1755,18 +1754,14 @@ def main():
                     y_noise = y_noise_range[rdm_y]  # [m]
                     z_noise = z_noise_range[rdm_z]  # [m]
 
-                    print("The cartesian noises added are %.3f, %.3f and %.3f" % (x_noise, y_noise, z_noise))
-
                     apple_proxy_experiment.add_cartesian_noise(x_noise, y_noise, z_noise)
+                    print("Cartesian noises added: %.3f, %.3f and %.3f" % (x_noise, y_noise, z_noise))                    
 
-                    # A final sweep of all the picks without ant noise
-                    # apple_proxy_experiment.add_cartesian_noise(0, 0, 0)
-
-                    # --- Add angular noise
+                    ## --- Add angular noise
                     print("\nHit 'Enter' to add angular noise")
                     raw_input()
-                    # Noise Ranges obtained in the proxy [deg]
 
+                    # Noise Ranges obtained in the proxy [deg]
                     # Original noise ranges - Obtained individually
                     # roll_noise_range = [-40, -32, -24, 24, 32, 40]
                     # pitch_noise_range = [24, 32, 40]
@@ -1787,15 +1782,10 @@ def main():
                     pitch_noise = math.radians(pitch_noise_range[rdm_pitch])  # [rad]
                     yaw_noise = math.radians(yaw_noise_range[rdm_yaw])  # [rad]
 
-                    print("The angular noises RPY added are %.3f and %.3f and %.3f" % (roll_noise, pitch_noise, yaw_noise))
-
-
                     apple_proxy_experiment.add_angular_noise(roll_noise, pitch_noise, yaw_noise)
+                    print("Angular noises RPY added: %.3f and %.3f and %.3f" % (roll_noise, pitch_noise, yaw_noise))
 
-                    # A final sweep of all the picks without ant noise
-                    # apple_proxy_experiment.add_angular_noise(0, 0, 0)
-
-                    # --- Arrange Rosbag file and subscribe to the topics that you want to record
+                    ## --- Arrange Rosbag file and subscribe to the topics that you want to record
                     rosbag_name = ''
                     sub_name = str(int(index)) + "-" + str(noise)
                     # location = '/media/avl/StudyData/Apple Pick Data/Apple Proxy Picks/3 - Winter 22 picks/apple_proxy_pick'     # Cindy's SSD
@@ -1819,25 +1809,23 @@ def main():
                     command = shlex.split(command)
                     rosbag_proc = subprocess.Popen(command)
 
-                    # Create csv with the metadata
+                    ## Create csv with metadata
                     csv_data = [0] * 20
                     csv_data[0] = "apple_proxy"
 
-                    # --- Publish "0" as event before closing hand
+                    ## --- Publish "0" as an event before opening hand
                     time.sleep(1)
                     apple_proxy_experiment.publish_event(0)
                     time.sleep(0.001)
 
-                    # --- Open gripper
-                    # print("::: Press 'Enter' to open the gripper :::")
-                    # raw_input()
+                    ## --- Open gripper as a precaution in cases that it was left closed
                     apple_proxy_experiment.publish_event(0)
                     time.sleep(0.001)
                     apple_proxy_experiment.publish_event(1)  # Event "1" means Gripper Open
                     time.sleep(0.001)
                     apple_proxy_experiment.open_hand_service()
 
-                    # --- Close gripper
+                    ## --- Close gripper
                     print("::: Press 'Enter' to close the gripper :::")
                     raw_input()
                     apple_proxy_experiment.publish_event(1)
@@ -1846,37 +1834,32 @@ def main():
                     time.sleep(0.001)
                     apple_proxy_experiment.close_hand_service()
 
-                    # --- Label GRASP
+                    ## --- Label GRASP
                     print("F0 proximal link (1-contact, 0-no contact) : ")
                     f0_proximal = ''
                     while ((f0_proximal is not '1') and (f0_proximal is not '0')):
                         f0_proximal = raw_input()
                     csv_data[1] = f0_proximal
-
                     print("F0 distal link (1-contact, 0-no contact) : ")
                     f0_distal = ''
                     while ((f0_distal is not '1') and (f0_distal is not '0')):
                         f0_distal = raw_input()
                     csv_data[2] = f0_distal
-
                     print("F1 proximal link (1-contact, 0-no contact) : ")
                     f1_proximal = ''
                     while ((f1_proximal is not '1') and (f1_proximal is not '0')):
                         f1_proximal = raw_input()
                     csv_data[3] = f1_proximal
-
                     print("F1 distal link (1-contact, 0-no contact) : ")
                     f1_distal = ''
                     while ((f1_distal is not '1') and (f1_distal is not '0')):
                         f1_distal = raw_input()
                     csv_data[4] = f1_distal
-
                     print("F2 proximal link (1-contact, 0-no contact) : ")
                     f2_proximal = ''
                     while ((f2_proximal is not '1') and (f2_proximal is not '0')):
                         f2_proximal = raw_input()
                     csv_data[5] = f2_proximal
-
                     print("F2 distal link (1-contact, 0-no contact) : ")
                     f2_distal = ''
                     while ((f2_distal is not '1') and (f2_distal is not '0')):
@@ -1888,34 +1871,31 @@ def main():
                     raw_input()
                     apple_proxy_experiment.publish_event(2)
                     time.sleep(0.001)
-                    apple_proxy_experiment.publish_event(3)  # Event "3" means Pulling Apple
-                    time.sleep(0.001)
-                    apple_proxy_experiment.retrieve(0.1)
+                    apple_proxy_experiment.publish_event(3)     # Event "3" means Pulling Apple
+                    time.sleep(0.001)                           # Pull apple
+                    apple_proxy_experiment.retrieve(0.1)        
                     time.sleep(0.001)
                     apple_proxy_experiment.publish_event(3)
                     time.sleep(0.001)
-                    apple_proxy_experiment.publish_event(4)  # Event "4" means Stop after Pull
+                    apple_proxy_experiment.publish_event(4)     # Event "4" means Stop after Pull
                     time.sleep(0.001)
 
-                    # --- Label PICK
+                    ## --- Label PICK
                     print("Slip during retrieval(y/n): ")
                     slip = ''
                     while ((slip is not 'y') and (slip is not 'n')):
                         slip = str(raw_input())
                     csv_data[7] = slip
-
                     print("Drop during retrieval(y/n): ")
                     drop = ''
                     while ((drop is not 'y') and (drop is not 'n')):
                         drop = str(raw_input())
                     csv_data[8] = drop
-
                     print("Stem shift during retrieval(y/n): ")
                     stem_shift = ''
                     while ((stem_shift is not 'y') and (stem_shift is not 'n')):
                         stem_shift = str(raw_input())
                     csv_data[9] = stem_shift
-
                     print("==Enter 's' or 'f' for pick success: ")
                     answer = ''
                     while ((answer is not 's') and (answer is not 'f')):
@@ -1923,35 +1903,34 @@ def main():
                     apple_proxy_experiment.success_or_failure(answer)
                     csv_data[10] = answer
 
-                    # --- Save the rest of the metadata and save it
-                    # Apple and Stem Ground Truth
+                    ## --- Save the rest of the metadata
+                    ## Apple and Stem Ground Truth
                     apple_proxy_experiment.baselink_cframe()
                     csv_data[11] = apple_proxy_experiment.apple_at_baselink
                     csv_data[12] = apple_proxy_experiment.calix_at_baselink
                     csv_data[13] = apple_proxy_experiment.stem_at_baselink
                     csv_data[14] = apple_proxy_experiment.stem_socket_at_baselink
-                    # End Effector Pose
+                    ## End Effector Pose
                     csv_data[15] = apple_proxy_experiment.pose_at_baselink
-                    # Nose that was added
+                    ## Added noise
                     noise_at_tool = [x_noise, y_noise, z_noise, roll_noise, pitch_noise, 0]
                     csv_data[16] = noise_at_tool
                     # Final Pose
                     #apple_proxy_experiment.write_csv(csv_data, sub_name)
 
-                    # --- Open Gripper
+                    ## --- Open Gripper
                     print("::: Press 'Enter' to open the gripper :::")
                     raw_input()
                     apple_proxy_experiment.publish_event(4)
                     time.sleep(0.001)
-                    apple_proxy_experiment.publish_event(1)  # Event "1" means Gripper Open
+                    apple_proxy_experiment.publish_event(1)         # Event "1" means Gripper Open
                     time.sleep(0.001)
-                    apple_proxy_experiment.open_hand_service()
-
+                    apple_proxy_experiment.open_hand_service()      # Open Hand
                     time.sleep(1)
                     apple_proxy_experiment.publish_event(1)
                     time.sleep(0.001)
 
-                    # --- Stop rosbag recording after each trial
+                    ## --- Stop rosbag recording after each trial
                     for proc in psutil.process_iter():
                         if "record" in proc.name() and set(command[2:]).issubset(proc.cmdline()):
                             proc.send_signal(subprocess.signal.SIGINT)
