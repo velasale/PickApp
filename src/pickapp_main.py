@@ -116,7 +116,7 @@ class AppleProxyExperiment(object):
 
         ## ............... PART 3 - GLOBAL VARIABLES AND PARAMETERS ..................
 
-        # Misc variables
+        ## Misc variables
         self.box_name = ''
         self.robot = robot
         self.scene = scene
@@ -130,7 +130,7 @@ class AppleProxyExperiment(object):
         self.eef_link = eef_link
         self.group_names = group_names
 
-        # Apple's and Stem Position
+        ## Apple's and Stem Position
         self.apple_pos_x = - 0.497  # Apple position in x-axis [m]
         self.apple_pos_y = - 0.278  # Apple position in y-axis [m]
         self.apple_pos_z = + 1.306  # Apple position in z-axis [m] : Height from the + Distance from table to,
@@ -144,9 +144,8 @@ class AppleProxyExperiment(object):
         self.stem_socket_at_baselink = [0, 0, 0]
         self.stem_socket = [0, 0, 0]
         self.stem_to_gravity = 0
-
-
-        # End Effector's psoe
+        
+        ## End Effector's pose
         self.pose_at_baselink = [0, 0, 0, 0, 0, 0, 0]  # x,y,z  and quaternion
 
         # Vector that points from the initial starting position, towards the center of the apple
@@ -1614,8 +1613,8 @@ def main():
 
         # --- Initialize UR5 at home position if needed
         print("\n     Type 'yes' or 'no' to move arm into the original UR5 home position")
-        go = raw_input()
-        if go == "yes":
+        go_home = raw_input()
+        if go_home == "yes":
             apple_proxy_experiment.go_home()            
 
         # --- Bring UR5 into a preliminary position to avoid weird poses
@@ -1627,7 +1626,7 @@ def main():
         # print("--- Align Arm with Stem")
         # print("--- Press 'Enter' when ready")
         # apple_proxy_experiment.align_with_stem()
-        
+
 
         # --- Read the csv file with all the angles from the real-apple picks [Hand-Stem, Stem-Gravity, Hand-gravity]
         location = '/root/ur5_ws/src/PickApp/data/real_apples/real_apples_fall21/'
