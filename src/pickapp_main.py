@@ -1607,10 +1607,10 @@ def main():
 
         apple_proxy_experiment.open_hand_service()
 
-        print("\n-------------------------------")
-        print("\n|   Apple Proxy experiments   |")
-        print("\n-------------------------------")
-        print("\n Stage 1: Initial Positioning of the robot w.r.t. the apples")
+        print("\n-----------------------------------------------------------------------")
+        print("|                       Apple Proxy experiments                       |")
+        print("-----------------------------------------------------------------------")
+        print("\n*** Stage 1: Initial Positioning of the robot w.r.t. the apples")
 
         # --- Initialize UR5 at home position if needed
         print("\n     Type 'yes' or 'no' to move arm into the original UR5 home position")
@@ -1644,7 +1644,7 @@ def main():
             write.writerows(real_pick_angles)
 
         # ----------------------------- Step 2 - Sweep all the real-apple picks ----------------------------------------
-        print("\n Stage 2: Replicating real apple pick poses within the proxyInitial Positioning of the robot w.r.t. the apples")
+        print("\n*** Stage 2: Replicating real apple pick poses within the proxy")
         for j in range(37, len(real_pick_angles)):
 
             # Avoid the picks in which the robot didn't find a solution within the Proxy
@@ -1660,8 +1660,8 @@ def main():
             index = round(float(pick[3]), 0)
             yaw = round(float(pick[4]), 0)
 
-            print("\n\n::::::::::::::::::::::: Replicating Real Apple Pick %i :::::::::::::::::::::::::::::" % index)
-            print("Hand-Stem angle: %.0f \nStem-Gravity angle: %.0f \nHand-Gravity angle: %.0f \nYaw: %0.f" % (
+            print("\n------ Replicating Real Apple Pick %i ------" % index)
+            print("       Hand-Stem angle: %.0f \n       Stem-Gravity angle: %.0f \n       Hand-Gravity angle: %.0f \n       Yaw: %0.f" % (
             hand_stem_angle,
             stem_gravity_angle,
             hand_gravity_angle, yaw))
