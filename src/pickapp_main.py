@@ -9,40 +9,38 @@ velasale@oregonstate.edu
 """
 # --- System related packages
 
-## ------------------------------------------------------------------------------------------------------------------------#
-
+## ---------------------------------------------------- LINE MAX LENGTH 125 CHAR--------------------------------------------#
+## --- Standard Library Imports
 import copy
+import csv
+import math
+import matplotlib.pyplot as pp
+import numpy as np
+from numpy import pi, cos, sin, arccos, arange
 import os
 import psutil
+from random import random
 import rospy
 import time
 import shlex
+import statistics as st
 import subprocess
 import sys
 
-# --- Math related packages
-import math
-import numpy as np
-from numpy import pi, cos, sin, arccos, arange
-from random import random
-import sympy as sym
-import statistics as st
-# --- ROS related packages
-import moveit_msgs.msg
+## --- Related 3rd party imports
 import geometry_msgs.msg
-import moveit_commander
 from geometry_msgs.msg import Pose, Point, Quaternion, Vector3, Polygon
+import moveit_commander
 from moveit_commander.conversions import pose_to_list
+import moveit_msgs.msg
+from std_msgs.msg import String, Int32
+import sympy as sym
 import tf
+from tf.transformations import euler_from_quaternion, quaternion_about_axis, quaternion_from_euler
 import tf2_ros
 import tf2_geometry_msgs  # **Do not use geometry_msgs. Use this instead for PoseStamped
-from tf.transformations import euler_from_quaternion, quaternion_about_axis, quaternion_from_euler
-from std_msgs.msg import String, Int32
 from visualization_msgs.msg import Marker, MarkerArray
-# --- Database related packages
-import csv
-# --- Visualization packages
-import matplotlib.pyplot as pp
+
 
 
 def all_close(goal, actual, tolerance):
