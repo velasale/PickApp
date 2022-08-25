@@ -1627,6 +1627,7 @@ def main():
         # print("--- Align Arm with Stem")
         # print("--- Press 'Enter' when ready")
         # apple_proxy_experiment.align_with_stem()
+        
 
         # --- Read the csv file with all the angles from the real-apple picks [Hand-Stem, Stem-Gravity, Hand-gravity]
         location = '/root/ur5_ws/src/PickApp/data/real_apples/real_apples_fall21/'
