@@ -8,7 +8,18 @@ velasale@oregonstate.edu
 
 """
 # --- System related packages
-import sys, copy, time, rospy, os, subprocess, shlex, psutil
+
+## ------------------------------------------------------------------------------------------------------------------------#
+
+import copy
+import os
+import psutil
+import rospy
+import time
+import shlex
+import subprocess
+import sys
+
 # --- Math related packages
 import math
 import numpy as np
@@ -17,10 +28,13 @@ from random import random
 import sympy as sym
 import statistics as st
 # --- ROS related packages
-import moveit_msgs.msg, geometry_msgs.msg, moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+import moveit_commander
 from geometry_msgs.msg import Pose, Point, Quaternion, Vector3, Polygon
 from moveit_commander.conversions import pose_to_list
-import tf, tf2_ros
+import tf
+import tf2_ros
 import tf2_geometry_msgs  # **Do not use geometry_msgs. Use this instead for PoseStamped
 from tf.transformations import euler_from_quaternion, quaternion_about_axis, quaternion_from_euler
 from std_msgs.msg import String, Int32
@@ -152,7 +166,7 @@ class AppleProxyExperiment(object):
         self.vector = [0, 0, 0]
         self.cross_vector = [0, 0, 0]
 
-        # Variables for the markers (sampling sphere, apple, ideal starting points)
+        ## Variables for the markers (sampling sphere, apple, ideal starting points)
         self.marker_id = 1
         self.proxy_markers = MarkerArray()
         self.markerPublisher = rospy.Publisher('balloons', MarkerArray, queue_size=1000)
@@ -164,7 +178,7 @@ class AppleProxyExperiment(object):
         self.proxy_markers.markers.append(wiper)
         self.markerPublisher.publish(self.proxy_markers)
 
-        # Arrays to keep track of the Pose achievements
+        ## Arrays to keep track of the Pose achievements
         self.pose_starts = []
         self.pose_yaws = []
         self.pose_noises = []
@@ -679,22 +693,22 @@ class AppleProxyExperiment(object):
     """
 
         text = "Going to an IDEAL Starting Position"
-        # Place a marker for the text
+        ## Place a marker for the text
         self.place_marker_text(self.apple_pos_x, self.apple_pos_y, self.apple_pos_z + 0.5, 0.1,
                                text)
 
-        # Listen to the TF topic
+        ## Listen to the TF topic
         tf_buffer = tf2_ros.Buffer()
         listener = tf2_ros.TransformListener(tf_buffer)
 
-        # --- Step 1: Assign Gripper's Goal Pose Position
-        # Read current pose
+        ## --- Step 1: Assign Gripper's Goal Pose Position
+        ## Read current pose
         current_pose = self.move_group.get_current_pose().pose
-        # Translate the apple's it into the tool's c-frame
+        ## Translate the apple's it into the tool's c-frame
         pose_at_world = tf2_geometry_msgs.PoseStamped()
         pose_at_world.pose = current_pose
 
-        # Find the orientation
+        ## Find the orientation
         delta_x = self.stem[0] - self.calix[0]
         delta_y = self.stem[1] - self.calix[1]
         delta_z = self.stem[2] - self.calix[2]
@@ -708,13 +722,13 @@ class AppleProxyExperiment(object):
         pose_at_world.pose.orientation.z = q[2]
         pose_at_world.pose.orientation.w = q[3]
 
-        # 1st Rotate
+        ## 1st Rotate
         self.move_group.set_pose_target(pose_at_world.pose)
         plan = self.move_group.go(wait=True)
         self.move_group.stop()
         self.move_group.clear_pose_targets()
 
-        # 2nd Translate
+        ## 2nd Translate
         pose_at_world.pose.position.x = self.apple_pos_x
         pose_at_world.pose.position.y = self.apple_pos_y
         pose_at_world.pose.position.z = self.apple_pos_z
@@ -1597,13 +1611,10 @@ class AppleProxyExperiment(object):
 def main():
     try:
 
-        # ------------------------------------- Step 1 - Initial Setup -------------------------------------------------
-        
+        ## ------------------------------------ Step 1 - Initial Setup -------------------------------------------------        
         apple_proxy_experiment = AppleProxyExperiment()
-
-        # Specify whether you will be using the hand or not, to avoid the program from crashing
+        ## Specify whether you will be using the hand or not, to avoid the program from crashing
         apple_proxy_experiment.use_hand = True
-
         apple_proxy_experiment.open_hand_service()
 
         print("\n-----------------------------------------------------------------------")
@@ -1611,13 +1622,13 @@ def main():
         print("-----------------------------------------------------------------------")
         print("\n*** Stage 1: Initial Positioning of the robot w.r.t. the apples")
 
-        # --- Initialize UR5 at home position if needed
+        ## --- Initialize UR5 at home position if needed
         print("\n     Type 'yes' or 'no' to move arm into the original UR5 home position")
         go_home = raw_input()
         if go_home == "yes":
             apple_proxy_experiment.go_home()            
 
-        # --- Bring UR5 into a preliminary position to avoid weird poses
+        ## --- Bring UR5 into a preliminary position to avoid weird poses
         print("     Press 'Enter' to move arm into a preliminary starting position")
         raw_input()
         apple_proxy_experiment.go_preliminary_position()
@@ -1627,15 +1638,14 @@ def main():
         # print("--- Press 'Enter' when ready")
         # apple_proxy_experiment.align_with_stem()
 
-
-        # --- Read the csv file with all the angles from the real-apple picks [Hand-Stem, Stem-Gravity, Hand-gravity]
+        # --- Read the csv file with all the pose reference angles from real-apple picks [Hand-Stem, Stem-Gravity, Hand-gravity]
         location = '/root/ur5_ws/src/PickApp/data/real_apples/real_apples_fall21/'
         file = 'real_picks_angles_yaw.csv'
         with open(location + file, 'r') as f:
             reader = csv.reader(f)
             angles = list(reader)
         
-        # --- Sort the list according to the Stem-Gravity angle in order to simplify the proxy arrangement
+        # --- Sort the angles list according to the Stem-Gravity angle in order to simplify the proxy arrangement
         real_pick_angles = np.array(angles)
         real_pick_angles = real_pick_angles[np.argsort(real_pick_angles[:, 1])]
         # Save list to a csv file
@@ -1875,7 +1885,7 @@ def main():
                         f2_distal = raw_input()
                     csv_data[6] = f2_distal
 
-                    # --- Perform pick by retrieving normally
+                    ## --- Perform pick by retrieving normally
                     print("\n::: Press 'Enter' to pull the apple :::")
                     raw_input()
                     apple_proxy_experiment.publish_event(2)
@@ -1996,8 +2006,7 @@ def main():
         #   time.sleep(0.001)
         #   apple_proxy_experiment.publish_event(2)
         #   time.sleep(0.001)
-        #   apple_proxy_experiment.closeHandService()
-        #
+        #   apple_proxy_experiment.closeHandService()      #
         #
         #
         #
