@@ -155,7 +155,7 @@ class AppleProxyExperiment(object):
         self.stem_to_gravity = 0
         
         ## End Effector's pose
-        self.pose_at_baselink = [0, 0, 0, 0, 0, 0, 0]  # x,y,z  and quaternion
+        self.pose_at_baselink = [0, 0, 0, 0, 0, 0, 0]  # x,y,z and quaternion
 
         # Vector that points from the initial starting position, towards the center of the apple
         self.vector = [0, 0, 0]
@@ -183,16 +183,18 @@ class AppleProxyExperiment(object):
         # Offset angle between a finger a the 0 YAW of Lisas's hand, which is required for the yaw adjustment
         self.finger_yaw = - 20 * pi / 180
 
+        ## Coordinates of points sampled on an imaginary sphere with center the apple
         self.x_coord = []
         self.y_coord = []
         self.z_coord = []
 
-        # trial number is used later in the program to make sure the csv and the corresponding bag file have the same pick #
+        ## Trial number is used later in the program to make sure the csv and the corresponding bag file have the same pick #
         self.trial_number = 0
 
         # Probe's parameters
-        self.probe_length = 0.1  # Length of probe in m
-        self.probe_base_width = 1.3 * 0.0254  # Width of the base of the probe in m
+        self.probe_length = 0.1                 # Length of probe in [m]
+        self.probe_base_width = 1.3 * 0.0254    # Width of the base of the probe in [m]. Caution: It includes the plate's width
+
         self.ref_frame = "world"
 
     ## ... Hand Related Functions...
@@ -1604,6 +1606,14 @@ class AppleProxyExperiment(object):
 
 
 def main():
+    """
+    This module is meant to perform apple picks in the apple proxy.
+    It consists of:
+        a) It replicates the pose of the robot w.r.t. apple from the real world
+        b) For each real worl pick it performs a certain number (e.g. 10) of trials, adding noise to each trial
+        c) It saves all the channels in a bagfiles, and the metadata in csv file
+    """
+
     try:
 
         ## ------------------------------------ Step 1 - Initial Setup -------------------------------------------------        
@@ -1915,7 +1925,7 @@ def main():
                     ## Added noise
                     noise_at_tool = [x_noise, y_noise, z_noise, roll_noise, pitch_noise, 0]
                     csv_data[16] = noise_at_tool
-                    # Final Pose
+                    ## Final Pose
                     #apple_proxy_experiment.write_csv(csv_data, sub_name)
 
                     ## --- Open Gripper
