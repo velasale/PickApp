@@ -413,8 +413,6 @@ def grasp_pick_indexes(time_list, grasp_start_time, grasp_end_time, pick_start_t
     return i, j, k, l
 
 
-
-
 def generate_plots(pdf_variable, plot_number, axrray, i, zoom='all', arm_filter_param=3, hand_filter_param=3,
                    target_label='(Successful-Pick)'):
     """
