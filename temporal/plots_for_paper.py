@@ -16,6 +16,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
 from matplotlib.patches import PathPatch
+from sklearn.cluster import KMeans
 
 
 # Function from ts-fresh
@@ -637,14 +638,15 @@ def temporal(locations, topic, variable, chunk):
 
 def main():
     # --- Data Location
-    main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
+    # main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
+    main = "/home/alejo/Downloads/"
     datasets = ['3_proxy_winter22_x1', '5_real_fall21_x1', '1_proxy_rob537_x1']
     stage = 'PICK'
     subfolder = '__for_proxy_real_comparison'
 
     # --- Variable that we wish to analyze
     variables = [' force_z', ' f1_acc_z', ' f2_acc_z', ' f1_gyro_x', ' f2_state_effort']
-    variable = variables[4]
+    variable = variables[0]
 
     # Assign the topic
     if variable == ' force_z' or variables == ' force_x' or variables == ' force_y' or variable == ' torque_z':
@@ -700,14 +702,17 @@ def main():
     case = 'failed'
 
     # Concatenate each folder
-    proxy_files_location_a = main + datasets[0] + '/' + stage + '/' + subfolder + '/' + case + '/'
-    proxy_files_location_b = main + datasets[2] + '/' + stage + '/' + subfolder + '/' + case + '/'
+    proxy_files_location_a = main + datasets[1] + '/' + stage + '/' + subfolder + '/' + case + '/'
+    proxy_files_location_b = main + datasets[1] + '/' + stage + '/' + subfolder + '/' + case + '/'
     real_files_location = main + datasets[1] + '/' + stage + '/' + subfolder + '/' + case + '/'
 
     # Get features from the REAL PICKS datasets
     rpeak_values, raucs, rslopes, raggs, real_picks_shapes = temporal([real_files_location], topic, variable, it)
     d = {'Peak [N]': rpeak_values, 'AUC [N.s]': raucs, 'Slope [N/s]': rslopes, 'Agg Linear Trend': raggs}
     real_failed_df = pd.DataFrame(data=d)
+
+    failed_real_peak_values = rpeak_values
+    failed_real_slopes = rslopes
 
     # Get features from the PROXY PICKS datasets
     ppeak_values, paucs, pslopes, paggs, proxy_picks_shapes = temporal([proxy_files_location_a, proxy_files_location_b],
@@ -754,8 +759,8 @@ def main():
     # -------------------------------------------- SUCCESS Cases -------------------------------------------------------
     case = 'success'
 
-    proxy_files_location_a = main + datasets[0] + '/' + stage + '/' + subfolder + '/' + case + '/'
-    proxy_files_location_b = main + datasets[2] + '/' + stage + '/' + subfolder + '/' + case + '/'
+    proxy_files_location_a = main + datasets[1] + '/' + stage + '/' + subfolder + '/' + case + '/'
+    proxy_files_location_b = main + datasets[1] + '/' + stage + '/' + subfolder + '/' + case + '/'
     real_files_location = main + datasets[1] + '/' + stage + '/' + subfolder + '/' + case + '/'
 
     # Get the information from the REAL PICKS datasets
@@ -763,12 +768,17 @@ def main():
     d = {'Peak [N]': rpeak_values, 'AUC [N.s]': raucs, 'Slope [N/s]': rslopes, 'Agg Linear Trend': raggs}
     real_success_df = pd.DataFrame(data=d)
 
+    success_real_peak_values = rpeak_values
+    success_real_slopes = rslopes
+
     # Get the information from the PROXY PICKS datasets
     ppeak_values, paucs, pslopes, paggs, proxy_picks_shapes = temporal([proxy_files_location_a, proxy_files_location_b],
                                                                        topic,
                                                                        variable, it)
     d = {'Peak [N]': ppeak_values, 'AUC [N.s]': paucs, 'Slope [N/s]': pslopes, 'Agg Linear Trend': paggs}
     proxy_success_df = pd.DataFrame(data=d)
+
+
 
     # print('T-test for success picks')
     # raggs = [x for x in raggs if math.isnan(x) == False]
@@ -813,6 +823,44 @@ def main():
 
     # strip_and_box(df3, 'Slope [N/s]', case, variable)
     # count_plot(proxy_picks_shapes, real_picks_shapes, case, variable)
+
+
+    # --- Plot histogram of Slopes
+    fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
+    real_slopes = []
+    for x in success_real_slopes:
+        value = x / (0.1 / 3)
+        real_slopes.append(value)
+    for x in failed_real_slopes:
+        value = x / (0.1 / 3)
+        real_slopes.append(value)
+
+    rslope_mean, rslope_dev, __ = statistics(real_slopes)
+
+    axs.hist(real_slopes)
+    plt.xlabel("Stiffness [N/m]")
+    plt.ylabel("Counts")
+    plt.title("Stiffness. Mean: " + str(rslope_mean) + "[N/m], STD: " + str(rslope_dev))
+
+    slopes_array = np.array(real_slopes)
+    slope_kmeans = KMeans(n_clusters=3, random_state=0).fit(slopes_array.reshape(-1, 1))
+    print("Slope Kmeans")
+    print(slope_kmeans.cluster_centers_)
+
+
+    # --- Plot histogram of Peak Forces
+    fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
+    rpeak_mean, rpeak_dev, __ = statistics(success_real_peak_values)
+
+    axs.hist(success_real_peak_values)
+    plt.xlabel("Peak Value [N]")
+    plt.ylabel("Counts")
+    plt.title("Peak zForce. Mean: " + str(rpeak_mean) + "[N/m], STD: " + str(rpeak_dev))
+
+    peaks_array = np.array(success_real_peak_values)
+    peak_kmeans = KMeans(n_clusters=3, random_state=0).fit(peaks_array.reshape(-1, 1))
+    print("Peak zForce Kmeans")
+    print(peak_kmeans.cluster_centers_)
 
     plt.show()
 
