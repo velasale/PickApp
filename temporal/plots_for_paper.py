@@ -635,8 +635,7 @@ def temporal(locations, topic, variable, chunk):
     return peak_values, aucs, slopes, agg_lins, shapes_frec
 
 
-if __name__ == "__main__":
-
+def main():
     # --- Data Location
     main = 'C:/Users/15416/Box/Learning to pick fruit/Apple Pick Data/RAL22 Paper/'
     datasets = ['3_proxy_winter22_x1', '5_real_fall21_x1', '1_proxy_rob537_x1']
@@ -656,7 +655,7 @@ if __name__ == "__main__":
         topic = 'f2_imu'
     elif variable == ' f3_acc_x' or variable == ' f3_acc_y' or variable == ' f3_acc_z' or variable == ' f3_gyro_x':
         topic = 'f3_imu'
-    elif variable ==' f2_state_effort':
+    elif variable == ' f2_state_effort':
         topic = 'f2_states'
 
     # --- Qualitative Comparison of Real vs Proxy ---
@@ -674,7 +673,7 @@ if __name__ == "__main__":
         ['32-4', '18'],  # Whale
         ['74-6', '17']  # Mouth
         #                 ['15-12', '13'], # Rounded Tip
-        ]
+    ]
 
     # qual_compare(main, datasets, stage, subfolder, 'failed', ['Start', 'Middle', 'Whale', 'End'], similar_pics, variable, topic)
     #
@@ -683,8 +682,8 @@ if __name__ == "__main__":
     #                ['11-10', '64'],     # Right Triangle
     #                ['49-10', '48'],     # Hunchback Cut
     #                ['26-12', '71'],     # Mouth Cut
-                   # ['25-0', '77'],      # Long Hunchback
-                   # ]
+    # ['25-0', '77'],      # Long Hunchback
+    # ]
     # qual_compare(main, datasets, stage, subfolder, 'success', ['s1', 's2', 's3', 's4'], similar_pics, variable)
 
     # --- Quantitative Comparison of Real vs Proxy ---
@@ -695,7 +694,7 @@ if __name__ == "__main__":
 
     av_list = []
     av_ref = 1
-    it = 5    #Chunk size
+    it = 5  # Chunk size
 
     # ---------------------------------------------- Failed Cases ------------------------------------------------------
     case = 'failed'
@@ -711,7 +710,8 @@ if __name__ == "__main__":
     real_failed_df = pd.DataFrame(data=d)
 
     # Get features from the PROXY PICKS datasets
-    ppeak_values, paucs, pslopes, paggs, proxy_picks_shapes = temporal([proxy_files_location_a, proxy_files_location_b], topic, variable, it)
+    ppeak_values, paucs, pslopes, paggs, proxy_picks_shapes = temporal([proxy_files_location_a, proxy_files_location_b],
+                                                                       topic, variable, it)
     d = {'Peak [N]': ppeak_values, 'AUC [N.s]': paucs, 'Slope [N/s]': pslopes, 'Agg Linear Trend': paggs}
     proxy_failed_df = pd.DataFrame(data=d)
 
@@ -729,14 +729,14 @@ if __name__ == "__main__":
     print("\n**** Real Statistics ****")
     print('          Mean,  Std, Cv')
     print("Peak : ", statistics(rpeak_values))
-    print("Slope: ", statistics(rslopes, 0.1/3))
+    print("Slope: ", statistics(rslopes, 0.1 / 3))
     print("AUCS : ", statistics(raucs, 30))
     print("ALT : ", statistics(raggs))
 
     print("\n**** Proxy Statistics ****")
     print('          Mean,  Std, Cv')
     print("Peak : ", statistics(ppeak_values))
-    print("Slope: ", statistics(pslopes, 0.1/3))
+    print("Slope: ", statistics(pslopes, 0.1 / 3))
     print("AUCS : ", statistics(paucs, 30))
     print("ALT : ", statistics(paggs))
 
@@ -764,11 +764,11 @@ if __name__ == "__main__":
     real_success_df = pd.DataFrame(data=d)
 
     # Get the information from the PROXY PICKS datasets
-    ppeak_values, paucs, pslopes, paggs, proxy_picks_shapes = temporal([proxy_files_location_a, proxy_files_location_b], topic,
-                                                                variable, it)
+    ppeak_values, paucs, pslopes, paggs, proxy_picks_shapes = temporal([proxy_files_location_a, proxy_files_location_b],
+                                                                       topic,
+                                                                       variable, it)
     d = {'Peak [N]': ppeak_values, 'AUC [N.s]': paucs, 'Slope [N/s]': pslopes, 'Agg Linear Trend': paggs}
     proxy_success_df = pd.DataFrame(data=d)
-
 
     # print('T-test for success picks')
     # raggs = [x for x in raggs if math.isnan(x) == False]
@@ -792,14 +792,14 @@ if __name__ == "__main__":
     print("\n**** Real Statistics ****")
     print('          Mean,  Std, Cv')
     print("Peak : ", statistics(rpeak_values))
-    print("Slope: ", statistics(rslopes, 0.1/3))
+    print("Slope: ", statistics(rslopes, 0.1 / 3))
     print("AUCS : ", statistics(raucs, 30))
     print("Feature : ", statistics(raggs))
     #
     print("\n**** Proxy Statistics ****")
     print('          Mean,  Std, Cv')
     print("Peak : ", statistics(ppeak_values))
-    print("Slope: ", statistics(pslopes, 0.1/3))
+    print("Slope: ", statistics(pslopes, 0.1 / 3))
     print("AUCS : ", statistics(paucs, 30))
     print("Feature : ", statistics(paggs))
 
@@ -815,3 +815,8 @@ if __name__ == "__main__":
     # count_plot(proxy_picks_shapes, real_picks_shapes, case, variable)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()
+
