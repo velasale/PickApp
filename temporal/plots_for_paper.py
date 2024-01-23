@@ -828,6 +828,8 @@ def main():
     # --- Plot histogram of Slopes
     fig, axs = plt.subplots(1, 1, figsize=(10, 7), tight_layout=True)
     real_slopes = []
+    # Note: The units of slope is given in [N/s] since its measured from the wrench time-series
+    # but if divided by the speed of the eef [m/s], we convert it into [N/m]
     for x in success_real_slopes:
         value = x / (0.1 / 3)
         real_slopes.append(value)
